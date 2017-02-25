@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Volumes/0-Treatment-assignments/0_permute_tr.log
+  log type:  text
+ opened on:  19 Aug 2016, 10:42:47
+
+. 
+. *----------------------------------------
+. * WASH Benefits Spillover Study
+. * Randomly permute treatment
+. * Cannot permute within blocks because the
+. * design is not balanced across blocks
+. *----------------------------------------
+. use "~/Dropbox/WASHB-Spillover-Data/Data/Untouched/Complete/WashB Spillover_mai
+> n_clean_all.dta", clear
+
+. 
+. * merge in blocks
+. preserve
+
+. use "/Volumes/0-Treatment-assignments/washb-bangladesh-tr.dta", clear
+(WASH Benefits Bangladesh cluster level treatment assignments)
+
+. duplicates drop
+
+Duplicates in terms of all variables
+
+(0 observations are duplicates)
+
+. tempfile blockf
+
+. save `blockf'
+file /var/folders/gh/bgfnnwkd7wdg7cw3q0_zwvt40000gp/T//S_08593.000002 saved
+
+. restore
+
+. 
+. merge m:1 clusterid using `blockf'
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                           540
+        from master                         0  (_merge==1)
+        from using                        540  (_merge==2)
+
+    matched                             1,799  (_merge==3)
+    -----------------------------------------
+
+. keep if _m==3
+(540 observations deleted)
+
+. drop _m
+
+. stop
+command stop is unrecognized
+r(199);
+
+end of do-file
+
+r(199);
+
+. keep dataid block tr clusterid
+
+. br
+
+. duplicates drop
+
+Duplicates in terms of all variables
+
+(0 observations are duplicates)
+
+. drop dataid
+
+. duplicates drop
+
+Duplicates in terms of all variables
+
+(1,619 observations deleted)
+
+. br
+
+. gen control=(tr==1)
+
+. gen wsh=(tr==5)
+
+. br
+
+. collapse (sum) control wsh, by(block) 
+
+. br
+
+. use "/Users/jadederong/Dropbox/WASHB-Bangladesh-Data/0-Untouched-data/1-Main-su
+> rvey/1_Baseline/1. WASHB_Baseline_main_survey.dta", clear
+
+. br
+
+. do "/var/folders/gh/bgfnnwkd7wdg7cw3q0_zwvt40000gp/T//SD08593.000000"
+
+. capture log close
