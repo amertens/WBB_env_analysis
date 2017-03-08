@@ -395,8 +395,16 @@ fly_mn_dry_M<-dry  %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$numfly, 
 
 
 #Create GLM wrapper function
-apply_glm_EM<-function(Ys,tr=d$tr,id=d$block, measure="RR", W=NULL, V=NULL){
+apply_glm_EM<-function(Ys,tr=d$tr,id=d$block, measure="RR", W, V){
 
+  #Ys=Y.log
+  #tr=d$tr
+  #id=d$block
+  #measure="RR"
+  #W=subset(d, select=wet)
+  #V="wet"
+  
+  
   W[,1]<-factor(W[,1])
   contrasts<-list(c("Control","Sanitation"), c("Control","WSH"),c("Sanitation","WSH"))
   varlist<-colnames(Ys)
@@ -405,9 +413,9 @@ apply_glm_EM<-function(Ys,tr=d$tr,id=d$block, measure="RR", W=NULL, V=NULL){
   for(i in 1:ncol(Ys)){
     cat("#",i,": ",varlist[i],"\n")
       if(measure=="RD" | measure=="neg.binom"){
-        temp<-matrix(NA, length(contrasts)*2, 6)
+        temp<-matrix(NA, length(contrasts)*2, 8)
       }else{
-        temp<-matrix(NA, length(contrasts)*2, 12)
+        temp<-matrix(NA, length(contrasts)*2, 16)
       }
     rownames(temp)<-c("Control v Sanitation dry","Control v Sanitation wet",
                       "Control v WSH dry","Control v WSH wet",
@@ -418,23 +426,38 @@ apply_glm_EM<-function(Ys,tr=d$tr,id=d$block, measure="RR", W=NULL, V=NULL){
           if(length(grep("numfly",varlist[i],ignore.case=TRUE))>0){
                       family="neg.binom"
                       }
-           temp2<-(washb_glm(Y=Ys[,i], tr=tr, W=W, V=V, id=id, pair=NULL, family=family, contrast= contrasts[[j]], print=F)$lincom)
-           temp[2*j-1,]<-as.numeric(temp2[1,2:7])
-           temp[2*j,]<-as.numeric(temp2[2,2:7])
-               colnames(temp)<-c("ATE","ci.lb","ci.lb","SE","Zval","P-val")
+           temp2<-(washb_glm(Y=Ys[,i], tr=tr, W=W, V=V, id=id, pair=NULL, family=family, contrast= contrasts[[j]], print=F))
+           temp[2*j-1,1:7]<-as.numeric(temp2$lincom[1,1:7])
+           temp[2*j,1:7]<-as.numeric(temp2$lincom[2,1:7])
+           if(family=="gaussian"){
+           temp[2*j-1,8]<-as.numeric(temp2$fit[4,6])
+           temp[2*j,8]<-as.numeric(temp2$fit[4,6])             
+           }
+           if(family=="neg.binom"){
+          temp[2*j-1,8]<-as.numeric(temp2$fit[4,7])
+           temp[2*j,8]<-as.numeric(temp2$fit[4,7])   
+           }
+               colnames(temp)<-c("Subgroup","ATE","ci.lb","ci.lb","SE","Zval","P-val", "Int-P")
             }
       if(measure=="RR"){
-        temp2<-(washb_glm(Y=Ys[,i], tr=tr, W=W, V=V, id=id, pair=NULL, family=poisson(link=`log`), contrast= contrasts[[j]], print=F)$lincom)
-        temp[2*j-1,1:6]<-as.numeric(temp2[1,2:7])
-        temp[2*j,1:6]<-as.numeric(temp2[2,2:7])
+        temp2<-(washb_glm(Y=Ys[,i], tr=tr, W=W, V=V, id=id, pair=NULL, family=poisson(link=`log`), contrast= contrasts[[j]], print=F))
+        temp[2*j-1,1:7]<-as.numeric(temp2$lincom[1,1:7])
+        temp[2*j,1:7]<-as.numeric(temp2$lincom[2,1:7])
+        temp[2*j-1,8]<-as.numeric(temp2$fit[4,7])
+        temp[2*j,8]<-as.numeric(temp2$fit[4,7])
 
-        temp2<-(washb_glm(Y=Ys[,i], tr=tr, W=W, V=V, id=id, pair=NULL, family="gaussian", contrast= contrasts[[j]], print=F)$lincom)
-        temp[2*j-1,7:12]<-as.numeric(temp2[1,2:7])
-        temp[2*j,7:12]<-as.numeric(temp2[2,2:7])
+        temp2<-(washb_glm(Y=Ys[,i], tr=tr, W=W, V=V, id=id, pair=NULL, family="gaussian", contrast= contrasts[[j]], print=F))
+        temp[2*j-1,9:15]<-as.numeric(temp2$lincom[1,1:7])
+        temp[2*j,9:15]<-as.numeric(temp2$lincom[2,1:7])
+        temp[2*j-1,16]<-as.numeric(temp2$fit[4,6])
+        temp[2*j,16]<-as.numeric(temp2$fit[4,6])
         
-        colnames(temp)<-c("RR","ci.lb","ci.lb","SE","Zval","P-val","ATE","ci.lb","ci.lb","SE","Zval","P-val")
+        colnames(temp)<-c("Subgroup","RR","ci.lb","ci.lb","SE","Zval","P-val","Int-P","subgroup","ATE","ci.lb","ci.lb","SE","Zval","P-val","Int-P")
           }
         }
+    temp<-data.frame(temp)
+    temp$Subgroup<-temp$Subgroup-1
+    if(measure=="RR"){temp$subgroup<-temp$subgroup-1}
     res_list[[i]]<-temp
     names(res_list)[[i]]<-varlist[i]
   }
@@ -452,164 +475,83 @@ pos_em<-apply_glm_EM(Ys=Y.pos,tr=d$tr,id=d$block, measure="RR",W=subset(d, selec
       
 #Prevalence Ratio
 #(H1): sanitation vs. control, combined WSH vs. control  
-ec_tw_rr_h1_wet_M<-pos_em[[1]][c(1,3),1:6]
-ec_sw_rr_h1_wet_M<-pos_em[[2]][c(1,3),1:6]
-ec_p_rr_h1_wet_M<-pos_em[[3]][c(1,3),1:6]
-ec_h_rr_h1_wet_M<-pos_em[[4]][c(1,3),1:6]
-ec_f_rr_h1_wet_M<-pos_em[[5]][c(1,3),1:6]
-ec_s_rr_h1_wet_M<-pos_em[[6]][c(1,3),1:6]
-ec_y_rr_h1_wet_M<-pos_em[[7]][c(1,3),1:6]
-fc_tw_rr_h1_wet_M<-pos_em[[8]][c(1,3),1:6]
-fc_sw_rr_h1_wet_M<-pos_em[[9]][c(1,3),1:6]
-fc_p_rr_h1_wet_M<-pos_em[[10]][c(1,3),1:6]
-fc_h_rr_h1_wet_M<-pos_em[[11]][c(1,3),1:6]
-fc_f_rr_h1_wet_M<-pos_em[[12]][c(1,3),1:6]
-fc_s_rr_h1_wet_M<-pos_em[[13]][c(1,3),1:6]
-fc_y_rr_h1_wet_M<-pos_em[[14]][c(1,3),1:6]
-fly_rr_h1_wet_M<-pos_em[[15]][c(1,3),1:6]
-mh_rr_h1_wet_M<-pos_em[[16]][c(1,3),1:6]
-ch_rr_h1_wet_M<-pos_em[[17]][c(1,3),1:6]
+ec_tw_rr_h1_em_M<-pos_em[[1]][1:4,1:8]
+ec_sw_rr_h1_em_M<-pos_em[[2]][1:4,1:8]
+ec_p_rr_h1_em_M<-pos_em[[3]][1:4,1:8]
+ec_h_rr_h1_em_M<-pos_em[[4]][1:4,1:8]
+ec_f_rr_h1_em_M<-pos_em[[5]][1:4,1:8]
+ec_s_rr_h1_em_M<-pos_em[[6]][1:4,1:8]
+ec_y_rr_h1_em_M<-pos_em[[7]][1:4,1:8]
+fc_tw_rr_h1_em_M<-pos_em[[8]][1:4,1:8]
+fc_sw_rr_h1_em_M<-pos_em[[9]][1:4,1:8]
+fc_p_rr_h1_em_M<-pos_em[[10]][1:4,1:8]
+fc_h_rr_h1_em_M<-pos_em[[11]][1:4,1:8]
+fc_f_rr_h1_em_M<-pos_em[[12]][1:4,1:8]
+fc_s_rr_h1_em_M<-pos_em[[13]][1:4,1:8]
+fc_y_rr_h1_em_M<-pos_em[[14]][1:4,1:8]
+fly_rr_h1_em_M<-pos_em[[15]][1:4,1:8]
+mh_rr_h1_em_M<-pos_em[[16]][1:4,1:8]
+ch_rr_h1_em_M<-pos_em[[17]][1:4,1:8]
 
 #(H2): combined WSH vs. sanitation.
-ec_tw_rr_h2_wet_M<-pos_em[[1]][5,1:6]
-ec_sw_rr_h2_wet_M<-pos_em[[2]][5,1:6]
-ec_p_rr_h2_wet_M<-pos_em[[3]][5,1:6]
-ec_h_rr_h2_wet_M<-pos_em[[4]][5,1:6]
-ec_f_rr_h2_wet_M<-pos_em[[5]][5,1:6]
-ec_s_rr_h2_wet_M<-pos_em[[6]][5,1:6]
-ec_y_rr_h2_wet_M<-pos_em[[7]][5,1:6]
-fc_tw_rr_h2_wet_M<-pos_em[[8]][5,1:6]
-fc_sw_rr_h2_wet_M<-pos_em[[9]][5,1:6]
-fc_p_rr_h2_wet_M<-pos_em[[10]][5,1:6]
-fc_h_rr_h2_wet_M<-pos_em[[11]][5,1:6]
-fc_f_rr_h2_wet_M<-pos_em[[12]][5,1:6]
-fc_s_rr_h2_wet_M<-pos_em[[13]][5,1:6]
-fc_y_rr_h2_wet_M<-pos_em[[14]][5,1:6]
-fly_rr_h2_wet_M<-pos_em[[15]][5,1:6]
-mh_rr_h2_wet_M<-pos_em[[16]][5,1:6]
-ch_rr_h2_wet_M<-pos_em[[17]][5,1:6]
+ec_tw_rr_h2_em_M<-pos_em[[1]][5:6,1:8]
+ec_sw_rr_h2_em_M<-pos_em[[2]][5:6,1:8]
+ec_p_rr_h2_em_M<-pos_em[[3]][5:6,1:8]
+ec_h_rr_h2_em_M<-pos_em[[4]][5:6,1:8]
+ec_f_rr_h2_em_M<-pos_em[[5]][5:6,1:8]
+ec_s_rr_h2_em_M<-pos_em[[6]][5:6,1:8]
+ec_y_rr_h2_em_M<-pos_em[[7]][5:6,1:8]
+fc_tw_rr_h2_em_M<-pos_em[[8]][5:6,1:8]
+fc_sw_rr_h2_em_M<-pos_em[[9]][5:6,1:8]
+fc_p_rr_h2_em_M<-pos_em[[10]][5:6,1:8]
+fc_h_rr_h2_em_M<-pos_em[[11]][5:6,1:8]
+fc_f_rr_h2_em_M<-pos_em[[12]][5:6,1:8]
+fc_s_rr_h2_em_M<-pos_em[[13]][5:6,1:8]
+fc_y_rr_h2_em_M<-pos_em[[14]][5:6,1:8]
+fly_rr_h2_em_M<-pos_em[[15]][5:6,1:8]
+mh_rr_h2_em_M<-pos_em[[16]][5:6,1:8]
+ch_rr_h2_em_M<-pos_em[[17]][5:6,1:8]
 
 
 #Prevalence Difference
 #(h1): sanitation vs. control, combined WSH vs. control  
-ec_tw_rd_h1_wet_M<-pos_em[[1]][c(1,3),7:12]
-ec_sw_rd_h1_wet_M<-pos_em[[2]][c(1,3),7:12]
-ec_p_rd_h1_wet_M<-pos_em[[3]][c(1,3),7:12]
-ec_h_rd_h1_wet_M<-pos_em[[4]][c(1,3),7:12]
-ec_f_rd_h1_wet_M<-pos_em[[5]][c(1,3),7:12]
-ec_s_rd_h1_wet_M<-pos_em[[6]][c(1,3),7:12]
-ec_y_rd_h1_wet_M<-pos_em[[7]][c(1,3),7:12]
-fc_tw_rd_h1_wet_M<-pos_em[[8]][c(1,3),7:12]
-fc_sw_rd_h1_wet_M<-pos_em[[9]][c(1,3),7:12]
-fc_p_rd_h1_wet_M<-pos_em[[10]][c(1,3),7:12]
-fc_h_rd_h1_wet_M<-pos_em[[11]][c(1,3),7:12]
-fc_f_rd_h1_wet_M<-pos_em[[12]][c(1,3),7:12]
-fc_s_rd_h1_wet_M<-pos_em[[13]][c(1,3),7:12]
-fc_y_rd_h1_wet_M<-pos_em[[14]][c(1,3),7:12]
-fly_rd_h1_wet_M<-pos_em[[15]][c(1,3),7:12]
-mh_rd_h1_wet_M<-pos_em[[16]][c(1,3),7:12]
-ch_rd_h1_wet_M<-pos_em[[17]][c(1,3),7:12]
+ec_tw_rd_h1_em_M<-pos_em[[1]][1:4,9:16]
+ec_sw_rd_h1_em_M<-pos_em[[2]][1:4,9:16]
+ec_p_rd_h1_em_M<-pos_em[[3]][1:4,9:16]
+ec_h_rd_h1_em_M<-pos_em[[4]][1:4,9:16]
+ec_f_rd_h1_em_M<-pos_em[[5]][1:4,9:16]
+ec_s_rd_h1_em_M<-pos_em[[6]][1:4,9:16]
+ec_y_rd_h1_em_M<-pos_em[[7]][1:4,9:16]
+fc_tw_rd_h1_em_M<-pos_em[[8]][1:4,9:16]
+fc_sw_rd_h1_em_M<-pos_em[[9]][1:4,9:16]
+fc_p_rd_h1_em_M<-pos_em[[10]][1:4,9:16]
+fc_h_rd_h1_em_M<-pos_em[[11]][1:4,9:16]
+fc_f_rd_h1_em_M<-pos_em[[12]][1:4,9:16]
+fc_s_rd_h1_em_M<-pos_em[[13]][1:4,9:16]
+fc_y_rd_h1_em_M<-pos_em[[14]][1:4,9:16]
+fly_rd_h1_em_M<-pos_em[[15]][1:4,9:16]
+mh_rd_h1_em_M<-pos_em[[16]][1:4,9:16]
+ch_rd_h1_em_M<-pos_em[[17]][1:4,9:16]
 
 #(H2): combined WSH vs. sanitation.
-ec_tw_rd_h2_wet_M<-pos_em[[1]][5,7:12]
-ec_sw_rd_h2_wet_M<-pos_em[[2]][5,7:12]
-ec_p_rd_h2_wet_M<-pos_em[[3]][5,7:12]
-ec_h_rd_h2_wet_M<-pos_em[[4]][5,7:12]
-ec_f_rd_h2_wet_M<-pos_em[[5]][5,7:12]
-ec_s_rd_h2_wet_M<-pos_em[[6]][5,7:12]
-ec_y_rd_h2_wet_M<-pos_em[[7]][5,7:12]
-fc_tw_rd_h2_wet_M<-pos_em[[8]][5,7:12]
-fc_sw_rd_h2_wet_M<-pos_em[[9]][5,7:12]
-fc_p_rd_h2_wet_M<-pos_em[[10]][5,7:12]
-fc_h_rd_h2_wet_M<-pos_em[[11]][5,7:12]
-fc_f_rd_h2_wet_M<-pos_em[[12]][5,7:12]
-fc_s_rd_h2_wet_M<-pos_em[[13]][5,7:12]
-fc_y_rd_h2_wet_M<-pos_em[[14]][5,7:12]
-fly_rd_h2_wet_M<-pos_em[[15]][5,7:12]
-mh_rd_h2_wet_M<-pos_em[[16]][5,7:12]
-ch_rd_h2_wet_M<-pos_em[[17]][5,7:12]
+ec_tw_rd_h2_em_M<-pos_em[[1]][5:6,9:16]
+ec_sw_rd_h2_em_M<-pos_em[[2]][5:6,9:16]
+ec_p_rd_h2_em_M<-pos_em[[3]][5:6,9:16]
+ec_h_rd_h2_em_M<-pos_em[[4]][5:6,9:16]
+ec_f_rd_h2_em_M<-pos_em[[5]][5:6,9:16]
+ec_s_rd_h2_em_M<-pos_em[[6]][5:6,9:16]
+ec_y_rd_h2_em_M<-pos_em[[7]][5:6,9:16]
+fc_tw_rd_h2_em_M<-pos_em[[8]][5:6,9:16]
+fc_sw_rd_h2_em_M<-pos_em[[9]][5:6,9:16]
+fc_p_rd_h2_em_M<-pos_em[[10]][5:6,9:16]
+fc_h_rd_h2_em_M<-pos_em[[11]][5:6,9:16]
+fc_f_rd_h2_em_M<-pos_em[[12]][5:6,9:16]
+fc_s_rd_h2_em_M<-pos_em[[13]][5:6,9:16]
+fc_y_rd_h2_em_M<-pos_em[[14]][5:6,9:16]
+fly_rd_h2_em_M<-pos_em[[15]][5:6,9:16]
+mh_rd_h2_em_M<-pos_em[[16]][5:6,9:16]
+ch_rd_h2_em_M<-pos_em[[17]][5:6,9:16]
 
-
-    
-      
-#Prevalence Ratio
-#(H1): sanitation vs. control, combined WSH vs. control  
-ec_tw_rr_h1_dry_M<-pos_em[[1]][c(2,4),1:6]
-ec_sw_rr_h1_dry_M<-pos_em[[2]][c(2,4),1:6]
-ec_p_rr_h1_dry_M<-pos_em[[3]][c(2,4),1:6]
-ec_h_rr_h1_dry_M<-pos_em[[4]][c(2,4),1:6]
-ec_f_rr_h1_dry_M<-pos_em[[5]][c(2,4),1:6]
-ec_s_rr_h1_dry_M<-pos_em[[6]][c(2,4),1:6]
-ec_y_rr_h1_dry_M<-pos_em[[7]][c(2,4),1:6]
-fc_tw_rr_h1_dry_M<-pos_em[[8]][c(2,4),1:6]
-fc_sw_rr_h1_dry_M<-pos_em[[9]][c(2,4),1:6]
-fc_p_rr_h1_dry_M<-pos_em[[10]][c(2,4),1:6]
-fc_h_rr_h1_dry_M<-pos_em[[11]][c(2,4),1:6]
-fc_f_rr_h1_dry_M<-pos_em[[12]][c(2,4),1:6]
-fc_s_rr_h1_dry_M<-pos_em[[13]][c(2,4),1:6]
-fc_y_rr_h1_dry_M<-pos_em[[14]][c(2,4),1:6]
-fly_rr_h1_dry_M<-pos_em[[15]][c(2,4),1:6]
-mh_rr_h1_dry_M<-pos_em[[16]][c(2,4),1:6]
-ch_rr_h1_dry_M<-pos_em[[17]][c(2,4),1:6]
-
-#(H2): combined WSH vs. sanitation.
-ec_tw_rr_h2_dry_M<-pos_em[[1]][6,1:6]
-ec_sw_rr_h2_dry_M<-pos_em[[2]][6,1:6]
-ec_p_rr_h2_dry_M<-pos_em[[3]][6,1:6]
-ec_h_rr_h2_dry_M<-pos_em[[4]][6,1:6]
-ec_f_rr_h2_dry_M<-pos_em[[5]][6,1:6]
-ec_s_rr_h2_dry_M<-pos_em[[6]][6,1:6]
-ec_y_rr_h2_dry_M<-pos_em[[7]][6,1:6]
-fc_tw_rr_h2_dry_M<-pos_em[[8]][6,1:6]
-fc_sw_rr_h2_dry_M<-pos_em[[9]][6,1:6]
-fc_p_rr_h2_dry_M<-pos_em[[10]][6,1:6]
-fc_h_rr_h2_dry_M<-pos_em[[11]][6,1:6]
-fc_f_rr_h2_dry_M<-pos_em[[12]][6,1:6]
-fc_s_rr_h2_dry_M<-pos_em[[13]][6,1:6]
-fc_y_rr_h2_dry_M<-pos_em[[14]][6,1:6]
-fly_rr_h2_dry_M<-pos_em[[15]][6,1:6]
-mh_rr_h2_dry_M<-pos_em[[16]][6,1:6]
-ch_rr_h2_dry_M<-pos_em[[17]][6,1:6]
-
-
-#Prevalence Difference
-#(h1): sanitation vs. control, combined WSH vs. control  
-ec_tw_rd_h1_dry_M<-pos_em[[1]][c(2,4),7:12]
-ec_sw_rd_h1_dry_M<-pos_em[[2]][c(2,4),7:12]
-ec_p_rd_h1_dry_M<-pos_em[[3]][c(2,4),7:12]
-ec_h_rd_h1_dry_M<-pos_em[[4]][c(2,4),7:12]
-ec_f_rd_h1_dry_M<-pos_em[[5]][c(2,4),7:12]
-ec_s_rd_h1_dry_M<-pos_em[[6]][c(2,4),7:12]
-ec_y_rd_h1_dry_M<-pos_em[[7]][c(2,4),7:12]
-fc_tw_rd_h1_dry_M<-pos_em[[8]][c(2,4),7:12]
-fc_sw_rd_h1_dry_M<-pos_em[[9]][c(2,4),7:12]
-fc_p_rd_h1_dry_M<-pos_em[[10]][c(2,4),7:12]
-fc_h_rd_h1_dry_M<-pos_em[[11]][c(2,4),7:12]
-fc_f_rd_h1_dry_M<-pos_em[[12]][c(2,4),7:12]
-fc_s_rd_h1_dry_M<-pos_em[[13]][c(2,4),7:12]
-fc_y_rd_h1_dry_M<-pos_em[[14]][c(2,4),7:12]
-fly_rd_h1_dry_M<-pos_em[[15]][c(2,4),7:12]
-mh_rd_h1_dry_M<-pos_em[[16]][c(2,4),7:12]
-ch_rd_h1_dry_M<-pos_em[[17]][c(2,4),7:12]
-
-#(H2): combined WSH vs. sanitation.
-ec_tw_rd_h2_dry_M<-pos_em[[1]][6,7:12]
-ec_sw_rd_h2_dry_M<-pos_em[[2]][6,7:12]
-ec_p_rd_h2_dry_M<-pos_em[[3]][6,7:12]
-ec_h_rd_h2_dry_M<-pos_em[[4]][6,7:12]
-ec_f_rd_h2_dry_M<-pos_em[[5]][6,7:12]
-ec_s_rd_h2_dry_M<-pos_em[[6]][6,7:12]
-ec_y_rd_h2_dry_M<-pos_em[[7]][6,7:12]
-fc_tw_rd_h2_dry_M<-pos_em[[8]][6,7:12]
-fc_sw_rd_h2_dry_M<-pos_em[[9]][6,7:12]
-fc_p_rd_h2_dry_M<-pos_em[[10]][6,7:12]
-fc_h_rd_h2_dry_M<-pos_em[[11]][6,7:12]
-fc_f_rd_h2_dry_M<-pos_em[[12]][6,7:12]
-fc_s_rd_h2_dry_M<-pos_em[[13]][6,7:12]
-fc_y_rd_h2_dry_M<-pos_em[[14]][6,7:12]
-fly_rd_h2_dry_M<-pos_em[[15]][6,7:12]
-mh_rd_h2_dry_M<-pos_em[[16]][6,7:12]
-ch_rd_h2_dry_M<-pos_em[[17]][6,7:12]
 
 
 #Binary outcomes- subgroup analysis
@@ -619,76 +561,101 @@ log_em<-apply_glm_EM(Ys=Y.log,tr=d$tr,id=d$block, measure="RD",W=subset(d, selec
 
 
 #(h1): sanitation vs. control, combined WSH vs. control  
-ec_tw_dif_h1_wet_M<-log_em[[1]][c(1,3),1:6]
-ec_sw_dif_h1_wet_M<-log_em[[2]][c(1,3),1:6]
-ec_p_dif_h1_wet_M<-log_em[[3]][c(1,3),1:6]
-ec_h_dif_h1_wet_M<-log_em[[4]][c(1,3),1:6]
-ec_f_dif_h1_wet_M<-log_em[[5]][c(1,3),1:6]
-ec_s_dif_h1_wet_M<-log_em[[6]][c(1,3),1:6]
-ec_y_dif_h1_wet_M<-log_em[[7]][c(1,3),1:6]
-fc_tw_dif_h1_wet_M<-log_em[[8]][c(1,3),1:6]
-fc_sw_dif_h1_wet_M<-log_em[[9]][c(1,3),1:6]
-fc_p_dif_h1_wet_M<-log_em[[10]][c(1,3),1:6]
-fc_h_dif_h1_wet_M<-log_em[[11]][c(1,3),1:6]
-fc_f_dif_h1_wet_M<-log_em[[12]][c(1,3),1:6]
-fc_s_dif_h1_wet_M<-log_em[[13]][c(1,3),1:6]
-fc_y_dif_h1_wet_M<-log_em[[14]][c(1,3),1:6]
-fly_dif_h1_wet_M<-log_em[[15]][c(1,3),1:6]
+ec_tw_dif_h1_em_M<-log_em[[1]][1:4,1:8]
+ec_sw_dif_h1_em_M<-log_em[[2]][1:4,1:8]
+ec_p_dif_h1_em_M<-log_em[[3]][1:4,1:8]
+ec_h_dif_h1_em_M<-log_em[[4]][1:4,1:8]
+ec_f_dif_h1_em_M<-log_em[[5]][1:4,1:8]
+ec_s_dif_h1_em_M<-log_em[[6]][1:4,1:8]
+ec_y_dif_h1_em_M<-log_em[[7]][1:4,1:8]
+fc_tw_dif_h1_em_M<-log_em[[8]][1:4,1:8]
+fc_sw_dif_h1_em_M<-log_em[[9]][1:4,1:8]
+fc_p_dif_h1_em_M<-log_em[[10]][1:4,1:8]
+fc_h_dif_h1_em_M<-log_em[[11]][1:4,1:8]
+fc_f_dif_h1_em_M<-log_em[[12]][1:4,1:8]
+fc_s_dif_h1_em_M<-log_em[[13]][1:4,1:8]
+fc_y_dif_h1_em_M<-log_em[[14]][1:4,1:8]
+fly_dif_h1_em_M<-log_em[[15]][1:4,1:8]
 
 #(H2): combined WSH vs. sanitation.
-ec_tw_dif_h2_wet_M<-log_em[[1]][5,1:6]
-ec_sw_dif_h2_wet_M<-log_em[[2]][5,1:6]
-ec_p_dif_h2_wet_M<-log_em[[3]][5,1:6]
-ec_h_dif_h2_wet_M<-log_em[[4]][5,1:6]
-ec_f_dif_h2_wet_M<-log_em[[5]][5,1:6]
-ec_s_dif_h2_wet_M<-log_em[[6]][5,1:6]
-ec_y_dif_h2_wet_M<-log_em[[7]][5,1:6]
-fc_tw_dif_h2_wet_M<-log_em[[8]][5,1:6]
-fc_sw_dif_h2_wet_M<-log_em[[9]][5,1:6]
-fc_p_dif_h2_wet_M<-log_em[[10]][5,1:6]
-fc_h_dif_h2_wet_M<-log_em[[11]][5,1:6]
-fc_f_dif_h2_wet_M<-log_em[[12]][5,1:6]
-fc_s_dif_h2_wet_M<-log_em[[13]][5,1:6]
-fc_y_dif_h2_wet_M<-log_em[[14]][5,1:6]
-fly_dif_h2_wet_M<-log_em[[15]][5,1:6]
+ec_tw_dif_h2_em_M<-log_em[[1]][5:6,1:8]
+ec_sw_dif_h2_em_M<-log_em[[2]][5:6,1:8]
+ec_p_dif_h2_em_M<-log_em[[3]][5:6,1:8]
+ec_h_dif_h2_em_M<-log_em[[4]][5:6,1:8]
+ec_f_dif_h2_em_M<-log_em[[5]][5:6,1:8]
+ec_s_dif_h2_em_M<-log_em[[6]][5:6,1:8]
+ec_y_dif_h2_em_M<-log_em[[7]][5:6,1:8]
+fc_tw_dif_h2_em_M<-log_em[[8]][5:6,1:8]
+fc_sw_dif_h2_em_M<-log_em[[9]][5:6,1:8]
+fc_p_dif_h2_em_M<-log_em[[10]][5:6,1:8]
+fc_h_dif_h2_em_M<-log_em[[11]][5:6,1:8]
+fc_f_dif_h2_em_M<-log_em[[12]][5:6,1:8]
+fc_s_dif_h2_em_M<-log_em[[13]][5:6,1:8]
+fc_y_dif_h2_em_M<-log_em[[14]][5:6,1:8]
+fly_dif_h2_em_M<-log_em[[15]][5:6,1:8]
 
 
 
 
 
-#(h1): sanitation vs. control, combined WSH vs. control  
-ec_tw_dif_h1_dry_M<-log_em[[1]][c(2,4),1:6]
-ec_sw_dif_h1_dry_M<-log_em[[2]][c(2,4),1:6]
-ec_p_dif_h1_dry_M<-log_em[[3]][c(2,4),1:6]
-ec_h_dif_h1_dry_M<-log_em[[4]][c(2,4),1:6]
-ec_f_dif_h1_dry_M<-log_em[[5]][c(2,4),1:6]
-ec_s_dif_h1_dry_M<-log_em[[6]][c(2,4),1:6]
-ec_y_dif_h1_dry_M<-log_em[[7]][c(2,4),1:6]
-fc_tw_dif_h1_dry_M<-log_em[[8]][c(2,4),1:6]
-fc_sw_dif_h1_dry_M<-log_em[[9]][c(2,4),1:6]
-fc_p_dif_h1_dry_M<-log_em[[10]][c(2,4),1:6]
-fc_h_dif_h1_dry_M<-log_em[[11]][c(2,4),1:6]
-fc_f_dif_h1_dry_M<-log_em[[12]][c(2,4),1:6]
-fc_s_dif_h1_dry_M<-log_em[[13]][c(2,4),1:6]
-fc_y_dif_h1_dry_M<-log_em[[14]][c(2,4),1:6]
-fly_dif_h1_dry_M<-log_em[[15]][c(2,4),1:6]
 
-#(H2): combined WSH vs. sanitation.
-ec_tw_dif_h2_dry_M<-log_em[[1]][6,1:6]
-ec_sw_dif_h2_dry_M<-log_em[[2]][6,1:6]
-ec_p_dif_h2_dry_M<-log_em[[3]][6,1:6]
-ec_h_dif_h2_dry_M<-log_em[[4]][6,1:6]
-ec_f_dif_h2_dry_M<-log_em[[5]][6,1:6]
-ec_s_dif_h2_dry_M<-log_em[[6]][6,1:6]
-ec_y_dif_h2_dry_M<-log_em[[7]][6,1:6]
-fc_tw_dif_h2_dry_M<-log_em[[8]][6,1:6]
-fc_sw_dif_h2_dry_M<-log_em[[9]][6,1:6]
-fc_p_dif_h2_dry_M<-log_em[[10]][6,1:6]
-fc_h_dif_h2_dry_M<-log_em[[11]][6,1:6]
-fc_f_dif_h2_dry_M<-log_em[[12]][6,1:6]
-fc_s_dif_h2_dry_M<-log_em[[13]][6,1:6]
-fc_y_dif_h2_dry_M<-log_em[[14]][6,1:6]
-fly_dif_h2_dry_M<-log_em[[15]][6,1:6]
+#Set H2 as df to match Ayse
+ec_tw_rr_h2_unadj_M<-as.data.frame(t(ec_tw_rr_h2_unadj_M))
+ec_sw_rr_h2_unadj_M<-as.data.frame(t(ec_sw_rr_h2_unadj_M))
+ec_p_rr_h2_unadj_M<-as.data.frame(t(ec_p_rr_h2_unadj_M))
+ec_h_rr_h2_unadj_M<-as.data.frame(t(ec_h_rr_h2_unadj_M))
+ec_f_rr_h2_unadj_M<-as.data.frame(t(ec_f_rr_h2_unadj_M))
+ec_s_rr_h2_unadj_M<-as.data.frame(t(ec_s_rr_h2_unadj_M))
+ec_y_rr_h2_unadj_M<-as.data.frame(t(ec_y_rr_h2_unadj_M))
+fc_tw_rr_h2_unadj_M<-as.data.frame(t(fc_tw_rr_h2_unadj_M))
+fc_sw_rr_h2_unadj_M<-as.data.frame(t(fc_sw_rr_h2_unadj_M))
+fc_p_rr_h2_unadj_M<-as.data.frame(t(fc_p_rr_h2_unadj_M))
+fc_h_rr_h2_unadj_M<-as.data.frame(t(fc_h_rr_h2_unadj_M))
+fc_f_rr_h2_unadj_M<-as.data.frame(t(fc_f_rr_h2_unadj_M))
+fc_s_rr_h2_unadj_M<-as.data.frame(t(fc_s_rr_h2_unadj_M))
+fc_y_rr_h2_unadj_M<-as.data.frame(t(fc_y_rr_h2_unadj_M))
+fly_rr_h2_unadj_M<-as.data.frame(t(fly_rr_h2_unadj_M))
+mh_rr_h2_unadj_M<-as.data.frame(t(mh_rr_h2_unadj_M))
+ch_rr_h2_unadj_M<-as.data.frame(t(ch_rr_h2_unadj_M))
+ec_tw_rd_h2_unadj_M<-as.data.frame(t(ec_tw_rd_h2_unadj_M))
+ec_sw_rd_h2_unadj_M<-as.data.frame(t(ec_sw_rd_h2_unadj_M))
+ec_p_rd_h2_unadj_M<-as.data.frame(t(ec_p_rd_h2_unadj_M))
+ec_h_rd_h2_unadj_M<-as.data.frame(t(ec_h_rd_h2_unadj_M))
+ec_f_rd_h2_unadj_M<-as.data.frame(t(ec_f_rd_h2_unadj_M))
+ec_s_rd_h2_unadj_M<-as.data.frame(t(ec_s_rd_h2_unadj_M))
+ec_y_rd_h2_unadj_M<-as.data.frame(t(ec_y_rd_h2_unadj_M))
+fc_tw_rd_h2_unadj_M<-as.data.frame(t(fc_tw_rd_h2_unadj_M))
+fc_sw_rd_h2_unadj_M<-as.data.frame(t(fc_sw_rd_h2_unadj_M))
+fc_p_rd_h2_unadj_M<-as.data.frame(t(fc_p_rd_h2_unadj_M))
+fc_h_rd_h2_unadj_M<-as.data.frame(t(fc_h_rd_h2_unadj_M))
+fc_f_rd_h2_unadj_M<-as.data.frame(t(fc_f_rd_h2_unadj_M))
+fc_s_rd_h2_unadj_M<-as.data.frame(t(fc_s_rd_h2_unadj_M))
+fc_y_rd_h2_unadj_M<-as.data.frame(t(fc_y_rd_h2_unadj_M))
+fly_rd_h2_unadj_M<-as.data.frame(t(fly_rd_h2_unadj_M))
+mh_rd_h2_unadj_M<-as.data.frame(t(mh_rd_h2_unadj_M))
+ch_rd_h2_unadj_M<-as.data.frame(t(ch_rd_h2_unadj_M))
+ec_tw_dif_h2_unadj_M<-as.data.frame(t(ec_tw_dif_h2_unadj_M))
+ec_sw_dif_h2_unadj_M<-as.data.frame(t(ec_sw_dif_h2_unadj_M))
+ec_p_dif_h2_unadj_M<-as.data.frame(t(ec_p_dif_h2_unadj_M))
+ec_h_dif_h2_unadj_M<-as.data.frame(t(ec_h_dif_h2_unadj_M))
+ec_f_dif_h2_unadj_M<-as.data.frame(t(ec_f_dif_h2_unadj_M))
+ec_s_dif_h2_unadj_M<-as.data.frame(t(ec_s_dif_h2_unadj_M))
+ec_y_dif_h2_unadj_M<-as.data.frame(t(ec_y_dif_h2_unadj_M))
+fc_tw_dif_h2_unadj_M<-as.data.frame(t(fc_tw_dif_h2_unadj_M))
+fc_sw_dif_h2_unadj_M<-as.data.frame(t(fc_sw_dif_h2_unadj_M))
+fc_p_dif_h2_unadj_M<-as.data.frame(t(fc_p_dif_h2_unadj_M))
+fc_h_dif_h2_unadj_M<-as.data.frame(t(fc_h_dif_h2_unadj_M))
+fc_f_dif_h2_unadj_M<-as.data.frame(t(fc_f_dif_h2_unadj_M))
+fc_s_dif_h2_unadj_M<-as.data.frame(t(fc_s_dif_h2_unadj_M))
+fc_y_dif_h2_unadj_M<-as.data.frame(t(fc_y_dif_h2_unadj_M))
+fly_dif_h2_unadj_M<-as.data.frame(t(fly_dif_h2_unadj_M))
+
+
+
+
+
+
+
 
 
 
@@ -942,226 +909,112 @@ file="Env_Count_Diff_unadj_Andrew_WB.Rdata")
 
 #Save wet RD
 save(
-ec_tw_rr_h1_wet_M,
-ec_sw_rr_h1_wet_M,
-ec_p_rr_h1_wet_M,
-ec_h_rr_h1_wet_M,
-ec_f_rr_h1_wet_M,
-ec_s_rr_h1_wet_M,
-ec_y_rr_h1_wet_M,
-fc_tw_rr_h1_wet_M,
-fc_sw_rr_h1_wet_M,
-fc_p_rr_h1_wet_M,
-fc_h_rr_h1_wet_M,
-fc_f_rr_h1_wet_M,
-fc_s_rr_h1_wet_M,
-fc_y_rr_h1_wet_M,
-fly_rr_h1_wet_M,
-mh_rr_h1_wet_M,
-ch_rr_h1_wet_M,
-ec_tw_rr_h2_wet_M,
-ec_sw_rr_h2_wet_M,
-ec_p_rr_h2_wet_M,
-ec_h_rr_h2_wet_M,
-ec_f_rr_h2_wet_M,
-ec_s_rr_h2_wet_M,
-ec_y_rr_h2_wet_M,
-fc_tw_rr_h2_wet_M,
-fc_sw_rr_h2_wet_M,
-fc_p_rr_h2_wet_M,
-fc_h_rr_h2_wet_M,
-fc_f_rr_h2_wet_M,
-fc_s_rr_h2_wet_M,
-fc_y_rr_h2_wet_M,
-fly_rr_h2_wet_M,
-mh_rr_h2_wet_M,
-ch_rr_h2_wet_M,
-file="Env_Risk_Ratio_wet_Andrew_WB.Rdata")
+ec_tw_rr_h1_em_M,
+ec_sw_rr_h1_em_M,
+ec_p_rr_h1_em_M,
+ec_h_rr_h1_em_M,
+ec_f_rr_h1_em_M,
+ec_s_rr_h1_em_M,
+ec_y_rr_h1_em_M,
+fc_tw_rr_h1_em_M,
+fc_sw_rr_h1_em_M,
+fc_p_rr_h1_em_M,
+fc_h_rr_h1_em_M,
+fc_f_rr_h1_em_M,
+fc_s_rr_h1_em_M,
+fc_y_rr_h1_em_M,
+fly_rr_h1_em_M,
+mh_rr_h1_em_M,
+ch_rr_h1_em_M,
+ec_tw_rr_h2_em_M,
+ec_sw_rr_h2_em_M,
+ec_p_rr_h2_em_M,
+ec_h_rr_h2_em_M,
+ec_f_rr_h2_em_M,
+ec_s_rr_h2_em_M,
+ec_y_rr_h2_em_M,
+fc_tw_rr_h2_em_M,
+fc_sw_rr_h2_em_M,
+fc_p_rr_h2_em_M,
+fc_h_rr_h2_em_M,
+fc_f_rr_h2_em_M,
+fc_s_rr_h2_em_M,
+fc_y_rr_h2_em_M,
+fly_rr_h2_em_M,
+mh_rr_h2_em_M,
+ch_rr_h2_em_M,
+file="Env_Risk_Ratio_em_Andrew_WB.Rdata")
 
 save(
-ec_tw_rd_h1_wet_M,
-ec_sw_rd_h1_wet_M,
-ec_p_rd_h1_wet_M,
-ec_h_rd_h1_wet_M,
-ec_f_rd_h1_wet_M,
-ec_s_rd_h1_wet_M,
-ec_y_rd_h1_wet_M,
-fc_tw_rd_h1_wet_M,
-fc_sw_rd_h1_wet_M,
-fc_p_rd_h1_wet_M,
-fc_h_rd_h1_wet_M,
-fc_f_rd_h1_wet_M,
-fc_s_rd_h1_wet_M,
-fc_y_rd_h1_wet_M,
-fly_rd_h1_wet_M,
-mh_rd_h1_wet_M,
-ch_rd_h1_wet_M,
-ec_tw_rd_h2_wet_M,
-ec_sw_rd_h2_wet_M,
-ec_p_rd_h2_wet_M,
-ec_h_rd_h2_wet_M,
-ec_f_rd_h2_wet_M,
-ec_s_rd_h2_wet_M,
-ec_y_rd_h2_wet_M,
-fc_tw_rd_h2_wet_M,
-fc_sw_rd_h2_wet_M,
-fc_p_rd_h2_wet_M,
-fc_h_rd_h2_wet_M,
-fc_f_rd_h2_wet_M,
-fc_s_rd_h2_wet_M,
-fc_y_rd_h2_wet_M,
-fly_rd_h2_wet_M,
-mh_rd_h2_wet_M,
-ch_rd_h2_wet_M,
-file="Env_Risk_diff_wet_Andrew_WB.Rdata")
+ec_tw_rd_h1_em_M,
+ec_sw_rd_h1_em_M,
+ec_p_rd_h1_em_M,
+ec_h_rd_h1_em_M,
+ec_f_rd_h1_em_M,
+ec_s_rd_h1_em_M,
+ec_y_rd_h1_em_M,
+fc_tw_rd_h1_em_M,
+fc_sw_rd_h1_em_M,
+fc_p_rd_h1_em_M,
+fc_h_rd_h1_em_M,
+fc_f_rd_h1_em_M,
+fc_s_rd_h1_em_M,
+fc_y_rd_h1_em_M,
+fly_rd_h1_em_M,
+mh_rd_h1_em_M,
+ch_rd_h1_em_M,
+ec_tw_rd_h2_em_M,
+ec_sw_rd_h2_em_M,
+ec_p_rd_h2_em_M,
+ec_h_rd_h2_em_M,
+ec_f_rd_h2_em_M,
+ec_s_rd_h2_em_M,
+ec_y_rd_h2_em_M,
+fc_tw_rd_h2_em_M,
+fc_sw_rd_h2_em_M,
+fc_p_rd_h2_em_M,
+fc_h_rd_h2_em_M,
+fc_f_rd_h2_em_M,
+fc_s_rd_h2_em_M,
+fc_y_rd_h2_em_M,
+fly_rd_h2_em_M,
+mh_rd_h2_em_M,
+ch_rd_h2_em_M,
+file="Env_Risk_diff_em_Andrew_WB.Rdata")
 
 #Save count difference
 save(
-ec_tw_dif_h1_wet_M,
-ec_sw_dif_h1_wet_M,
-ec_p_dif_h1_wet_M,
-ec_h_dif_h1_wet_M,
-ec_f_dif_h1_wet_M,
-ec_s_dif_h1_wet_M,
-ec_y_dif_h1_wet_M,
-fc_tw_dif_h1_wet_M,
-fc_sw_dif_h1_wet_M,
-fc_p_dif_h1_wet_M,
-fc_h_dif_h1_wet_M,
-fc_f_dif_h1_wet_M,
-fc_s_dif_h1_wet_M,
-fc_y_dif_h1_wet_M,
-fly_dif_h1_wet_M,
-ec_tw_dif_h2_wet_M,
-ec_sw_dif_h2_wet_M,
-ec_p_dif_h2_wet_M,
-ec_h_dif_h2_wet_M,
-ec_f_dif_h2_wet_M,
-ec_s_dif_h2_wet_M,
-ec_y_dif_h2_wet_M,
-fc_tw_dif_h2_wet_M,
-fc_sw_dif_h2_wet_M,
-fc_p_dif_h2_wet_M,
-fc_h_dif_h2_wet_M,
-fc_f_dif_h2_wet_M,
-fc_s_dif_h2_wet_M,
-fc_y_dif_h2_wet_M,
-fly_dif_h2_wet_M,
-file="Env_Count_Diff_wet_Andrew_WB.Rdata")
-
-
-
-
-
-#Save dry RR
-save(
-ec_tw_rr_h1_dry_M,
-ec_sw_rr_h1_dry_M,
-ec_p_rr_h1_dry_M,
-ec_h_rr_h1_dry_M,
-ec_f_rr_h1_dry_M,
-ec_s_rr_h1_dry_M,
-ec_y_rr_h1_dry_M,
-fc_tw_rr_h1_dry_M,
-fc_sw_rr_h1_dry_M,
-fc_p_rr_h1_dry_M,
-fc_h_rr_h1_dry_M,
-fc_f_rr_h1_dry_M,
-fc_s_rr_h1_dry_M,
-fc_y_rr_h1_dry_M,
-fly_rr_h1_dry_M,
-mh_rr_h1_dry_M,
-ch_rr_h1_dry_M,
-ec_tw_rr_h2_dry_M,
-ec_sw_rr_h2_dry_M,
-ec_p_rr_h2_dry_M,
-ec_h_rr_h2_dry_M,
-ec_f_rr_h2_dry_M,
-ec_s_rr_h2_dry_M,
-ec_y_rr_h2_dry_M,
-fc_tw_rr_h2_dry_M,
-fc_sw_rr_h2_dry_M,
-fc_p_rr_h2_dry_M,
-fc_h_rr_h2_dry_M,
-fc_f_rr_h2_dry_M,
-fc_s_rr_h2_dry_M,
-fc_y_rr_h2_dry_M,
-fly_rr_h2_dry_M,
-mh_rr_h2_dry_M,
-ch_rr_h2_dry_M,
-file="Env_Risk_Ratio_dry_Andrew_WB.Rdata")
-
-#Save dry RD
-save(
-ec_tw_rd_h1_dry_M,
-ec_sw_rd_h1_dry_M,
-ec_p_rd_h1_dry_M,
-ec_h_rd_h1_dry_M,
-ec_f_rd_h1_dry_M,
-ec_s_rd_h1_dry_M,
-ec_y_rd_h1_dry_M,
-fc_tw_rd_h1_dry_M,
-fc_sw_rd_h1_dry_M,
-fc_p_rd_h1_dry_M,
-fc_h_rd_h1_dry_M,
-fc_f_rd_h1_dry_M,
-fc_s_rd_h1_dry_M,
-fc_y_rd_h1_dry_M,
-fly_rd_h1_dry_M,
-mh_rd_h1_dry_M,
-ch_rd_h1_dry_M,
-ec_tw_rd_h2_dry_M,
-ec_sw_rd_h2_dry_M,
-ec_p_rd_h2_dry_M,
-ec_h_rd_h2_dry_M,
-ec_f_rd_h2_dry_M,
-ec_s_rd_h2_dry_M,
-ec_y_rd_h2_dry_M,
-fc_tw_rd_h2_dry_M,
-fc_sw_rd_h2_dry_M,
-fc_p_rd_h2_dry_M,
-fc_h_rd_h2_dry_M,
-fc_f_rd_h2_dry_M,
-fc_s_rd_h2_dry_M,
-fc_y_rd_h2_dry_M,
-fly_rd_h2_dry_M,
-mh_rd_h2_dry_M,
-ch_rd_h2_dry_M,
-file="Env_Risk_diff_dry_Andrew_WB.Rdata")
-
-#Save count difference
-save(
-ec_tw_dif_h1_dry_M,
-ec_sw_dif_h1_dry_M,
-ec_p_dif_h1_dry_M,
-ec_h_dif_h1_dry_M,
-ec_f_dif_h1_dry_M,
-ec_s_dif_h1_dry_M,
-ec_y_dif_h1_dry_M,
-fc_tw_dif_h1_dry_M,
-fc_sw_dif_h1_dry_M,
-fc_p_dif_h1_dry_M,
-fc_h_dif_h1_dry_M,
-fc_f_dif_h1_dry_M,
-fc_s_dif_h1_dry_M,
-fc_y_dif_h1_dry_M,
-fly_dif_h1_dry_M,
-ec_tw_dif_h2_dry_M,
-ec_sw_dif_h2_dry_M,
-ec_p_dif_h2_dry_M,
-ec_h_dif_h2_dry_M,
-ec_f_dif_h2_dry_M,
-ec_s_dif_h2_dry_M,
-ec_y_dif_h2_dry_M,
-fc_tw_dif_h2_dry_M,
-fc_sw_dif_h2_dry_M,
-fc_p_dif_h2_dry_M,
-fc_h_dif_h2_dry_M,
-fc_f_dif_h2_dry_M,
-fc_s_dif_h2_dry_M,
-fc_y_dif_h2_dry_M,
-fly_dif_h2_dry_M,
-file="Env_Count_Diff_dry_Andrew_WB.Rdata")
+ec_tw_dif_h1_em_M,
+ec_sw_dif_h1_em_M,
+ec_p_dif_h1_em_M,
+ec_h_dif_h1_em_M,
+ec_f_dif_h1_em_M,
+ec_s_dif_h1_em_M,
+ec_y_dif_h1_em_M,
+fc_tw_dif_h1_em_M,
+fc_sw_dif_h1_em_M,
+fc_p_dif_h1_em_M,
+fc_h_dif_h1_em_M,
+fc_f_dif_h1_em_M,
+fc_s_dif_h1_em_M,
+fc_y_dif_h1_em_M,
+fly_dif_h1_em_M,
+ec_tw_dif_h2_em_M,
+ec_sw_dif_h2_em_M,
+ec_p_dif_h2_em_M,
+ec_h_dif_h2_em_M,
+ec_f_dif_h2_em_M,
+ec_s_dif_h2_em_M,
+ec_y_dif_h2_em_M,
+fc_tw_dif_h2_em_M,
+fc_sw_dif_h2_em_M,
+fc_p_dif_h2_em_M,
+fc_h_dif_h2_em_M,
+fc_f_dif_h2_em_M,
+fc_s_dif_h2_em_M,
+fc_y_dif_h2_em_M,
+fly_dif_h2_em_M,
+file="Env_Count_Diff_em_Andrew_WB.Rdata")
 
 
 
@@ -1189,7 +1042,10 @@ file="Env_Count_Diff_dry_Andrew_WB.Rdata")
 
 
 
-temp_stop_function<-function(a){
+
+
+
+#temp_stop_function<-function(a){
 ########################
 #Adjusted analysis
 ########################
@@ -1504,8 +1360,105 @@ W_food<- cbind(W,W_food)
 ########################
 #Adjusted analysis- TMLE
 ########################
+apply_glm<-function(Ys,tr=d$tr,id=d$block, measure="RR"){
+  contrasts<-list(c("Control","Sanitation"), c("Control","WSH"),c("Sanitation","WSH"))
 
+  varlist<-colnames(Ys)
+  res_list<-NULL
+  for(i in 1:ncol(Ys)){
+    cat("#",i,": ",varlist[i],"\n")
+      if(measure=="RD" | measure=="neg.binom"){
+        temp<-matrix(NA, length(contrasts), 7)
+      }else{
+        temp<-matrix(NA, length(contrasts), 13)
+      }
+    rownames(temp)<-c("Control v Sanitation","Control v WSH","Sanitation v WSH")
+    for(j in 1:length(contrasts)){
+      if(measure=="RD"){
+           family="gaussian"
+           k=6
+          if(length(grep("numfly",varlist[i],ignore.case=TRUE))>0){
+                      family="neg.binom"
+                      k=7
+                      }
+      temp[j,1:k]<-as.numeric(washb_glm(Y=Ys[,i], tr=tr, W=NULL, id=id, pair=NULL, family=family, contrast= contrasts[[j]], print=F)$TR)
+               if(family=="gaussian"){colnames(temp)<-c("ATE","ci.lb","ci.lb","SE","Zval","P-val","na")} 
+               if(family=="neg.binom"){colnames(temp)<-c("ATE","ci.lb","ci.lb","Estimate","SE","Zval","P-val")} 
+            }
+      if(measure=="RR"){
+        temp[j,1:7]<-as.numeric(washb_glm(Y=Ys[,i], tr=tr, W=NULL, id=id, pair=NULL, family=poisson(link=`log`), contrast= contrasts[[j]], print=F)$TR)
+        temp[j,8:13]<-as.numeric(washb_glm(Y=Ys[,i], tr=tr, W=NULL, id=id, pair=NULL, family="gaussian", contrast= contrasts[[j]], print=F)$TR)
 
+        colnames(temp)<-c("RR","ci.lb","ci.lb","estimate","SE","Zval","P-val","ATE","ci.lb","ci.lb","SE","Zval","P-val")
+          }
+        }
+    res_list[[i]]<-temp
+    names(res_list)[[i]]<-varlist[i]
+  }
+  return(res_list)
+}
+
+apply_tmle<-function(Ys,tr=d$tr,W=NULL,id=d$block, clusterid=d$clusterid, dataid=d$dataid, contrast, family ,library=c("SL.mean","SL.glm","SL.bayesglm","SL.gam","SL.glmnet"), measure="RR"){
+  #contrasts<-list(c("Control","Sanitation"), c("Control","WSH"),c("Sanitation","WSH"))
+  
+  varlist<-colnames(Ys)
+  res_list<-NULL
+  for(i in 1:ncol(Ys)){
+    cat("#",i,": ",varlist[i],"\n")
+      if(measure=="RD"){
+        temp<-matrix(NA, length(contrasts), 4)
+      }else{
+        temp<-matrix(NA, length(contrasts), 8)
+      }
+    rownames(temp)<-c("Control v Sanitation","Control v WSH","Sanitation v WSH")
+    dat<-data.frame(Y=Ys[,i], tr=tr, id=id, clusterid=clusterid, dataid=dataid)
+    for(j in 1:length(contrasts)){
+      dat<-dat[order(dat$id, dat$clusterid, dat$dataid),]
+      fit<-washb_tmle(Y=dat$Y, tr=dat$tr, W=W[[i]], id=dat$id, pair=NULL, family=family, contrast= contrasts[[j]], seed=12345, print=F)
+      temp[j,1:4] <-cbind(fit$estimates$ATE$psi,t(fit$estimates$ATE$CI),fit$estimates$ATE$pvalue)
+      if(measure=="RR"){
+        temp[j,5:8] <-cbind(fit$estimates$RR$psi,t(fit$estimates$RR$CI),fit$estimates$RR$pvalue)
+        colnames(temp)<-c("ATE","ci.lb","ci.lb","P-val","RR","ci.lb","ci.lb","P-val")
+      }else{
+          colnames(temp)<-c("ATE","ci.lb","ci.lb","P-val")
+      }
+    }
+    res_list[[i]]<-temp
+    names(res_list)[[i]]<-varlist[i]
+  }
+  return(res_list)
+}
+
+apply_glm<-function(Ys,tr=d$tr,id=d$block, measure="RR"){
+  contrasts<-list(c("Control","Sanitation"), c("Control","WSH"),c("Sanitation","WSH"))
+  
+  varlist<-colnames(Ys)
+  res_list<-NULL
+  for(i in 1:ncol(Ys)){
+    cat("#",i,": ",varlist[i],"\n")
+      if(measure=="RD"){
+        temp<-matrix(NA, length(contrasts), 6)
+      }else{
+        temp<-matrix(NA, length(contrasts), 12)
+      }
+    rownames(temp)<-c("Control v Sanitation","Control v WSH","Sanitation v WSH")
+    for(j in 1:length(contrasts)){
+      if(measure=="RD"){
+      temp[j,1:6]<-washb_glm(Y=Ys[,i], tr=tr, W=NULL, id=id, pair=NULL, family="gaussian", contrast= contrasts[[j]], seed=12345, print=F)$TR
+                colnames(temp)<-c("ATE","ci.lb","ci.lb","SE","Zval","P-val")
+      }
+      if(measure=="RR"){
+        temp[j,1:6]<-washb_glm(Y=Ys[,i], tr=tr, W=NULL, id=id, pair=NULL, family=binomial(link=`log`), contrast= contrasts[[j]], seed=12345, print=F)$TR
+        temp[j,7:12]<-washb_glm(Y=Ys[,i], tr=tr, W=NULL, id=id, pair=NULL, family="gaussian", contrast= contrasts[[j]], seed=12345, print=F)$TR
+
+        colnames(temp)<-c("ATE","ci.lb","ci.lb","SE","Zval","P-val","RR","ci.lb","ci.lb","SE","Zval","P-val")
+      }
+    }
+    res_list[[i]]<-temp
+    names(res_list)[[i]]<-varlist[i]
+  }
+  return(res_list)
+}
 
 #Create lists of Ws
 colnames(Y.pos)
@@ -1640,7 +1593,6 @@ fly_dif_h2_adj_M<-log_adj[[15]][3,1:4]
 
 
 
-
 #Save adjusted RR
 save(
 ec_tw_rr_h1_adj_M,
@@ -1750,5 +1702,5 @@ fc_s_dif_h2_adj_M,
 fc_y_dif_h2_adj_M,
 fly_dif_h2_adj_M,
 file="Env_Count_Diff_adj_Andrew_WB.Rdata")
-}
+#}
 

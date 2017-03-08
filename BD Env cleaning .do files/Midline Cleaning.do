@@ -117,9 +117,11 @@ drop _merge
 gen date= dofc(q2_2toytime) //Which should I use for survey date?
 format date %d
 
-gen month=month(date)
-gen byte rain= month>5 & month<11
-replace rain=. if month==.
+*gen month=month(date)
+*rename q1_3monthsd1 month
+*destring month, replace
+*gen byte rain= month>5 & month<11
+*replace rain=. if month==.
 *XXXXXXXXXXXXXXXX
 
 
@@ -134,6 +136,12 @@ codebook agey
 
 *Clean variables
 destring dataid, replace
+
+destring q1_3monthsd1, replace
+replace q1_3monthsd1=10 if dataid==42605
+
+gen byte wet= q1_3monthsd1>5 & q1_3monthsd1<11
+table wet
 
 rename  q3_6kitnum numfly_kit
 	replace numfly_kit=. if numfly_kit==99
@@ -166,7 +174,7 @@ gen byte mhdirt = (q3_2mlnail==1 | q3_2mlpalm==1 | q3_2mlpad==1 | q3_2mrnail==1 
 gen byte chdirt = (q3_2chlnail==1 | q3_2chlpalm==1 | q3_2chlpad==1 | q3_2chrnail==1 | q3_2chrpalm==1 | q3_2chrpad==1)
 	replace chdirt = . if (q3_2chlnail==. & q3_2chlpalm==. & q3_2chlpad==. & q3_2chrnail==. & q3_2chrpalm==. & q3_2chrpad==.)
 
-keep dataid clusterid MonthCollectedH logecH logfcH ecposH fcposH MonthCollectedT logecT logfcT ecposT fcposT MonthCollectedW logecW logfcW ecposW fcposW sex date agem mhdirt chdirt numfly_kit numfly_lat flycaught_kit flycaught_lat rain
+keep dataid clusterid MonthCollectedH logecH logfcH ecposH fcposH MonthCollectedT logecT logfcT ecposT fcposT MonthCollectedW logecW logfcW ecposW fcposW sex date agem mhdirt chdirt numfly_kit numfly_lat flycaught_kit flycaught_lat wet
 
 gen test= string(dataid, "%05.0f")
 gen test2= substr(test, 1, 3)
@@ -174,6 +182,7 @@ gen test2= substr(test, 1, 3)
 replace clusterid=test2 if clusterid==""
 drop test test2
 sort clusterid
+
 
 *Merge in treatment information
 merge clusterid using `tr'

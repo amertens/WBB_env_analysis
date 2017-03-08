@@ -117,10 +117,16 @@ drop _merge
 gen date = date(EntryDate_d1, "YMD")  //Which should I use for survey date?
 format date %td
 
-gen month=month(date)
-gen byte rain= month>5 & month<11
-replace rain=. if month==.
+*gen month=month(date)
+*gen byte rain= month>5 & month<11
+*replace rain=. if month==.
+destring month_day1, replace
+gen byte wet= month_day1>5 & month_day1<11
+table wet
 *XXXXXXXXXXXXXXXX
+
+
+
 
 
 gen aged = date-DOB
@@ -169,7 +175,7 @@ gen byte mhdirt = (q3mo_L_Nail==1 | q3mo_L_Palm==1 | q3mo_L_Finger==1 | q3mo_R_N
 gen byte chdirt = (q3ch_L_Nail==1 | q3ch_L_Palm==1 | q3ch_L_Finger==1 | q3ch_R_Nail==1 | q3ch_R_Palm==1 | q3ch_R_Finger==1)
 	replace chdirt = . if (q3ch_L_Nail==. & q3ch_L_Palm==. & q3ch_L_Finger==. & q3ch_R_Nail==. & q3ch_R_Palm==. & q3ch_R_Finger==.)
 
-keep dataid clusterid MonthCollectedH logecH logfcH ecposH fcposH MonthCollectedT logecT logfcT ecposT fcposT MonthCollectedW logecW logfcW ecposW fcposW sex date agem mhdirt chdirt numfly_kit numfly_lat flycaught_kit flycaught_lat logecF logfcF ecposF fcposF rain
+keep dataid clusterid MonthCollectedH logecH logfcH ecposH fcposH MonthCollectedT logecT logfcT ecposT fcposT MonthCollectedW logecW logfcW ecposW fcposW sex date agem mhdirt chdirt numfly_kit numfly_lat flycaught_kit flycaught_lat logecF logfcF ecposF fcposF wet
 
 gen dataid_str= string(dataid, "%05.0f")
 gen clusterid_new= substr(dataid_str, 1, 3)
