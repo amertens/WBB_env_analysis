@@ -144,12 +144,12 @@ gen byte wet= q1_3monthsd1>5 & q1_3monthsd1<11
 table wet
 
 rename  q3_6kitnum numfly_kit
-	replace numfly_kit=. if numfly_kit==99
+	replace numfly_kit=. if numfly_kit==99 | numfly_kit==999
 gen byte flycaught_kit = numfly_kit>0
 	replace flycaught_kit=. if numfly_kit==.
 
 rename  q3_13latnum  numfly_lat
-	replace numfly_lat=. if numfly_lat==99
+	replace numfly_lat=. if numfly_lat==99 | numfly_lat==999
 gen byte flycaught_lat = numfly_lat>0
 	replace flycaught_lat=. if numfly_lat==.
 
@@ -189,6 +189,8 @@ merge clusterid using `tr'
 tab _merge
 keep if _merge==3
 codebook tr
+
+
 
 cd "C:/Users/andre/Dropbox/WASHB EML/Analysis Datasets/Andrew"
 saveold "Env_midline_clean.dta", replace version(12)

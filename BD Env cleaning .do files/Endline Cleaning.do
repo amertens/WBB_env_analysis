@@ -143,13 +143,13 @@ destring dataid, replace
 
 rename  q3_6kit_fly_total numfly_kit
 destring numfly_kit, replace
-	replace numfly_kit=. if numfly_kit==99
+	replace numfly_kit=. if numfly_kit==99 | numfly_kit==999
 gen byte flycaught_kit = numfly_kit>0
 	replace flycaught_kit=. if numfly_kit==.
 
 rename  q3_13lat_fly_total  numfly_lat
 destring numfly_lat, replace
-	replace numfly_lat=. if numfly_lat==99
+	replace numfly_lat=. if numfly_lat==99 | numfly_lat==999 
 gen byte flycaught_lat = numfly_lat>0
 	replace flycaught_lat=. if numfly_lat==.
 
