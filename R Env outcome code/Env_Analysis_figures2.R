@@ -551,199 +551,124 @@ cgrey <- "#777777"
 cols=c(C=cblack,W=cblue,S=cteal,H=cgreen,WSH=corange,N=cred,"WSH+N"=cmagent)
 
 
+# main study colors
+# cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+# cols <- c("gray30",cbPalette[c(2:4,6:8)])
+# brighter color blind palette:  https://personal.sron.nl/~pault/ 
+cblack <- "#000004FF"
+cblue <- "#3366AA"
+cteal <- "#11AA99"
+cgreen <- "#66AA55"
+cchartr <- "#CCCC55"
+cmagent <- "#992288"
+cred <- "#EE3333"
+corange <- "#EEA722"
+cyellow <- "#FFEE33"
+cgrey <- "#777777"
+cols=c(C=cblack,W=cblue,S=cteal,H=cgreen,WSH=corange,N=cred,"WSH+N"=cmagent)
 
 
-ci.width=0.5 #Width of confidence interval bars
-ylim=c(0.25,0.8) #Size of Y axis
-vjust= -1 #Vertical justification of printed prevalence
-hjust= -0.2 #Horizontal justification of printed prevalence
-linesize=1
-alpha=0.3
 
-#-----------------------------------
-# Create plot functions
-#-----------------------------------
 
-plot_function<-function(d, y="Prevalence" , ylab, ylines=seq(0, 100, by=25) , point.lab=NULL, logY=F, ci.width=0.5, ylim=c(0,100), ylim_discrete=NULL, linesize=0.6, vjust= 1.5, hjust= 0.5, alpha=0.3){
+ci.width<-0.5 #Width of confidence interval bars
+ylim<-c(0.25,0.8) #Size of Y axis
+vjust<- -1 #Vertical justification of printed prevalence
+hjust<- -0.2 #Horizontal justification of printed prevalence
+
+#-------------------------------------------
+# Function for individual plots
+#-------------------------------------------
+plotfacet<-function(d, 
+                    vars,
+                    ci.width=0.5,
+                    ylim=c(0.25,0.8),
+                    vjust= -1,
+                    hjust= -0.2){
+
+  d<-subset(d, round==vars[1] & Location==vars[2])  
   
-  if(is.null(point.lab)){
-    d$point.lab<-d[,y]
-  }else{
-      d$point.lab<-d[,point.lab]
-    }
-  
-  d$y<-d[,y]
-  
-  localenv <- environment()
-  
-  p<-ggplot(data = d, environment = localenv) + 
-  geom_point(mapping = aes(x=TR.N, y=y, color=TR), size=2) +
-  geom_errorbar(mapping = aes(x=TR.N, y=y, ymin=lower.ci, ymax=upper.ci, color=TR), size=linesize, width=ci.width) +
-  geom_text(aes(x=TR.N, y=lower.ci, label=point.lab, color=TR),hjust=hjust, vjust=vjust, size=3,face="bold") +
-  #scale_x_continuous(breaks=c(1,2,3,4,5,6),labels=levels(d$TR),expand=c(0,0)) +
-  scale_colour_manual(values = cols) +
-  facet_grid( ~ Location, scales = "free_x", space = "free_x") +
+p<- ggplot(data = d) + 
+  geom_point(mapping = aes(x=TR.N, y=Prevalence, color=TR),pch=21,cex=2,lwd=2)+  #, size=3) +
+  geom_errorbar(mapping = aes(x=TR.N, y=Prevalence, ymin=lower.ci, ymax=upper.ci, color=TR), size=1, width=ci.width) +
+  geom_text(aes(x=TR.N, y=Prevalence, label=prev.perc, color=TR),hjust=hjust, vjust=vjust, size=3,face="bold") +
+  #geom_text(aes(x=TR.N, y=-Inf, label=N, color=TR),hjust=0, vjust=0, size=3,face="bold") +
+  scale_y_continuous(limits = ylim, labels=percent)+ 
   #theme_bw() +
   theme_light() +
   #theme_minimal() +
   #theme_classic() +
   #theme_tufte() +
-  labs(x="Subgroup", y=ylab, color="Treatment")+
-  theme(axis.text.x = element_text(color="#666666"),   #angle = 45, hjust = 1),
-        axis.text.y = element_text(color="#666666"),
-        axis.title.y = element_text(angle=0, vjust = 0.5, color="#666666", face="bold"),
+  ggtitle(ifelse(vars[1]=="World Bank",vars[2],"")) +
+  labs(x="Subgroup", y=ifelse(vars[2]=="Tubewell",vars[1],""), color="Treatment")+
+  scale_colour_manual(values = cols) +
+  theme(#axis.text.x = element_text(color="#666666", face="bold"),   #angle = 45, hjust = 1),
+        #axis.text.x=element_blank(),
+        axis.text.y = element_text(color="#666666", face="bold"),
+        axis.title.y = element_text(color="#666666", face="bold"),
         axis.title.x=element_blank(),
         strip.text.x = element_text(color="#666666", face="bold"),
+        strip.text.y = element_text(color="#666666", face="bold"),
         strip.background = element_rect( fill=NA),
-        panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank(),
+        #panel.grid.major=element_blank(),
+        axis.line=element_line(),
+        plot.title = element_text(hjust = 0.5),
         legend.position="none") 
-  
-  if(logY!=T){
-    p <- p + geom_hline(yintercept=ylines, linetype="dashed", alpha=alpha)
-  } 
-  
-  if(logY==T){
-    p <- p + scale_y_log10() +
-             geom_hline(yintercept=ylines, linetype="dashed", alpha=alpha)
-  }
-  
-  
-  if(is.null(ylim_discrete)){
-     p <- p + scale_y_continuous(limits = ylim)
-  }
-  if(!is.null(ylim_discrete)){
-     p <- p + scale_y_discrete(limits=ylim_discrete)
-  }
-  
-
-bp <- ggplotGrob(p)
-wh <- which(grepl("axis-b", bp$layout$name)) # get the x-axis grob
-
-
-bp$grobs[wh] <- lapply(bp$grobs[wh], function(gg) {
-   ## we need to extract the right element
-   ## this is not that straight forward, but in principle I used 'str' to scan through
-   ## the objects to find out which element I would need
-   kids <- gg$children 
-   wh <- which(sapply(kids$axis$grobs, function(.) grepl("axis\\.text", .$name)))
-   axis.text <- kids$axis$grobs[[wh]]$children[[1]]
-   ## Now that we found the right element, we have to replicate the colour and change 
-   ## the element corresponding to 'sophie'
-   axis.text$gp$col <- rep(axis.text$gp$col, length(axis.text$label))
-   axis.text$gp$col[grepl("H", axis.text$label)]<- cols[7]
-   for(i in 1:length(levels(prev_wb$TR))){
-   axis.text$gp$col[grepl(paste0("^",levels(prev_wb$TR)[i],"\n"), axis.text$label)] <- cols[i]
-   }
-   ## write the changed object back to the respective slot
-   kids$axis$grobs[[wh]]$children[[1]] <- axis.text
-   gg$children <- kids
-   gg
-})
-  
-  return(bp)
+  return(p)
 }
 
 
-#-----------------------------------
-# Prevalence Plots
-#-----------------------------------
+#-------------------------------------------
+# Combined prevalence plot
+#-------------------------------------------
 
-wb.plot<-plot_function(prev_wb, ci.width=0.45, point.lab="log10", linesize=0.6, ylab="E.coli \nprevalence \nat early \nassessment \n(%)", vjust=1.5)
-#grid.draw(wb.plot)
+vars<- list(c("World Bank", "Tubewell"),
+            c("World Bank", "Stored water"),
+            c("World Bank", "Hands"),
+            c("World Bank", "Food"),
+            c("World Bank", "Ponds"),
+            c("World Bank", "Soil"),
+            c("World Bank", "Flies"),
+            c("Year 1", "Tubewell"),
+            c("Year 1", "Stored water"),
+            c("Year 1", "Hands"),
+            c("Year 1", "Toys"),
+            c("Year 2", "Tubewell"),
+            c("Year 2", "Stored water"),
+            c("Year 2", "Hands"),
+            c("Year 2", "Food"),
+            c("Year 2", "Toys"))
 
-mid.plot<-plot_function(prev_mid, ci.width=0.25, point.lab="log10", ylab="E.coli \nprevalence \nat one-year \nassessment \n(%)", vjust=1.5)
-#grid.draw(mid.plot)
+prev.plots <- lapply(vars, plotfacet, 
+                  d = prev.dat, 
+                  ci.width=ci.width,
+                  ylim=ylim,
+                  vjust=vjust,
+                  hjust=hjust)
+#Make empty plot with just title for the toys panel
+empty<-ggplot()+ theme_tufte() + ggtitle("Toys") + theme(plot.title = element_text(hjust = 0.5))
+empty
 
-end.plot<-plot_function(prev_end, ci.width=0.35, point.lab="log10", ylab="E.coli \nprevalence \nat two-year \nassessment \n(%)", vjust=1.5)
-#grid.draw(end.plot)
 
+#Print plots together 
+
+lay <- rbind(c(1,2,3,4,5,6,7,8),
+             c(9,10,11,12,13,14,15,16),
+             c(17,18,19,20,21,22,23,24))
+t <- textGrob("")
+prev.plot<-grid.arrange(prev.plots[[1]], prev.plots[[2]], prev.plots[[3]], prev.plots[[4]], empty, prev.plots[[5]], prev.plots[[6]], prev.plots[[7]], 
+             prev.plots[[8]], prev.plots[[9]], prev.plots[[10]], t, prev.plots[[11]], t, t, t,
+             prev.plots[[12]], prev.plots[[13]], prev.plots[[14]], prev.plots[[15]], prev.plots[[16]], t, t, t,
+             layout_matrix  = lay)
+
+prev.plot[[9]]
 
 setwd("C:/Users/andre/Dropbox/WASHB EML/Results/Figures")
-pdf("Env Prevalence Plot.pdf",width=15,height=10)
+pdf("Env Prevalence Plot.pdf",width=40,height=10)
 
-grid.arrange(wb.plot, mid.plot, end.plot, nrow=3)
+grid.newpage()
+grid.draw(prev.plot)
 
 dev.off()
 
-
-#-----------------------------------
-# Mean Plots
-#-----------------------------------
-
-# 
-# wb.mn.plot<-plot_function(mn_wb, y="Mean Log Count",seq(-10, 10, by=1), logY=F, ylim=c(-0.2,5.5), ylim_discrete=c(0,1,2,3,4,5), ci.width=0.45, linesize=0.6, ylab="E.coli \nlog 10 count \nat early \nassessment ")
-# #grid.draw(wb.mn.plot)
-# 
-# mid.mn.plot<-plot_function(mn_mid, y="Mean Log Count", seq(-10, 10, by=1), logY=F, ylim=c(-0.2,5.5), ylim_discrete=c(0,1,2,3), ci.width=0.475, ylab="E.coli \nlog 10 count \nat one-year \nassessment ")
-# #grid.draw(mid.mn.plot)
-# 
-# end.mn.plot<-plot_function(mn_end, y="Mean Log Count", seq(-10, 10, by=1), logY=F, ylim=c(-0.2,5.5), ylim_discrete=c(0,1,2,3), ci.width=0.6, ylab="E.coli \nlog 10 count \nat two-year \nassessment ")
-# #grid.draw(end.mn.plot)
-# 
-# 
-# setwd("C:/Users/andre/Dropbox/WASHB EML/Results/Figures")
-# pdf("Env Log Count Plot.pdf",width=15,height=10)
-# 
-# grid.arrange(wb.mn.plot, mid.mn.plot, end.mn.plot, nrow=3)
-# 
-# dev.off()
-
-
-#-----------------------------------
-# Prevalence ratio Plots
-#-----------------------------------
-
-
-
-wb.pr.plot<-plot_function(pr_wb, y="PR", ylines=seq(0, 3, by=.5), logY=F, ylim=c(0.25,1.81), ci.width=0.3, linesize=0.6, ylab="E.coli \nprevalence \nratio \nat early \nassessment ")
-#grid.draw(wb.pr.plot)
-
-mid.pr.plot<-plot_function(pr_mid, y="PR", ylines=seq(0, 3, by=.5), logY=F, ylim=c(0.25,1.81), ci.width=0.15, ylab="E.coli \nprevalence \nratio \nat one-year \nassessment ")
-#grid.draw(mid.pr.plot)
-
-end.pr.plot<-plot_function(pr_end, y="PR", ylines=seq(0, 3, by=.5), logY=F, ylim=c(0.25,1.81), ci.width=0.25, ylab="E.coli \nprevalence \nratio \nat two-year \nassessment ")
-#grid.draw(end.pr.plot)
-
-setwd("C:/Users/andre/Dropbox/WASHB EML/Results/Figures")
-pdf("Env Prev Ratio Plot.pdf",width=15,height=10)
-
-grid.arrange(wb.pr.plot, mid.pr.plot, end.pr.plot, nrow=3)
-
-dev.off()
-
-#-----------------------------------
-# Log-count differenc Plots
-#-----------------------------------
-
-
-wb.dif.plot<-plot_function(dif_wb, y="Dif", ylines=seq(-10, 10, by=.5), logY=F, ylim=c(-1.5,1), ci.width=0.3, linesize=0.6, ylab="E.coli log 10 \ndifference \nat early \nassessment")
-grid.draw(wb.dif.plot)
-
-mid.dif.plot<-plot_function(dif_mid, y="Dif", ylines=seq(-10, 10, by=.5), logY=F, ylim=c(-1.5,1), ci.width=0.15, ylab="E.coli log 10 \ndifference \nat one-year \nassessment")
-#grid.draw(mid.dif.plot)
-
-end.dif.plot<-plot_function(dif_end, y="Dif", ylines=seq(-10, 10, by=.5), logY=F, ylim=c(-1.5,1), ci.width=0.225, ylab="E.coli log 10 \ndifference \nat two-year \nassessment")
-#grid.draw(end.dif.plot)
-
-setwd("C:/Users/andre/Dropbox/WASHB EML/Results/Figures")
-pdf("Env Log Count Difference Plot.pdf",width=15,height=10)
-
-grid.arrange(wb.dif.plot, mid.dif.plot, end.dif.plot, nrow=3)
-
-dev.off()
-
-
-
-#All 4 plots together
-setwd("C:/Users/andre/Dropbox/WASHB EML/Results/Figures")
-pdf("Env Plots V3.pdf",width=15,height=10)
-
-grid.arrange(wb.plot, mid.plot, end.plot, nrow=3)
-#grid.arrange(wb.mn.plot, mid.mn.plot, end.mn.plot, nrow=3)
-grid.arrange(wb.pr.plot, mid.pr.plot, end.pr.plot, nrow=3)
-grid.arrange(wb.dif.plot, mid.dif.plot, end.dif.plot, nrow=3)
-
-dev.off()
 
 
