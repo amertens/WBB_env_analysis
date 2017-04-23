@@ -133,7 +133,6 @@ fly_kit_mn_end_M<-d  %>% subset(tr!="Water" & tr!="Handwashing")  %>% group_by(t
 fly_lat_mn_end_M<-d  %>% subset(tr!="Water" & tr!="Handwashing")  %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$numfly_lat, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
 
 ec_f_mn_end_M<-d %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$logecF, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
-#fc_f_mn_end_M<-d %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$logfcF, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
 
 
 

@@ -63,6 +63,7 @@ dim(d)
 
 
 #Generate pooled treatment variables
+table(d$tr)
 d$tr.pool<-"NA"
 d$tr.pool[d$tr=="WSH"|d$tr=="Nutrition + WSH"]<-"WSH+WSHN pooled"
 d$tr.pool[d$tr=="Control"|d$tr=="Nutrition"]<-"C+N pooled"

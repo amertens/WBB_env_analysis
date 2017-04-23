@@ -1412,10 +1412,19 @@ apply_tmle<-function(Ys,tr=d$tr,W=NULL,id=d$block, clusterid=d$clusterid, dataid
       }
     rownames(temp)<-c("Control v Sanitation","Control v WSH","Sanitation v WSH")
     dat<-data.frame(Y=Ys[,i], tr=tr, id=id, clusterid=clusterid, dataid=dataid)
+    cat(colnames(Ys)[i],"\n")
     for(j in 1:length(contrasts)){
+          FECR=NULL
+          if(length(grep("numfly",varlist[i],ignore.case=TRUE))>0){
+                      FECR="arithmetic"
+                      }
       dat<-dat[order(dat$id, dat$clusterid, dat$dataid),]
-      fit<-washb_tmle(Y=dat$Y, tr=dat$tr, W=W[[i]], id=dat$id, pair=NULL, family=family, contrast= contrasts[[j]], seed=12345, print=F)
+      cat(contrasts[[j]],"\n")
+      fit<-washb_tmle(Y=dat$Y, tr=dat$tr, W=W[[i]], id=dat$id, pair=NULL, FECR=FECR, family=family, contrast= contrasts[[j]], seed=12345, print=T)
       temp[j,1:4] <-cbind(fit$estimates$ATE$psi,t(fit$estimates$ATE$CI),fit$estimates$ATE$pvalue)
+          if(length(grep("numfly",varlist[i],ignore.case=TRUE))>0){
+            temp[j,1:4] <-cbind(fit$estimates$FECR$psi,t(fit$estimates$FECR$CI),fit$estimates$FECR$pvalue)
+            }
       if(measure=="RR"){
         temp[j,5:8] <-cbind(fit$estimates$RR$psi,t(fit$estimates$RR$CI),fit$estimates$RR$pvalue)
         colnames(temp)<-c("ATE","ci.lb","ci.lb","P-val","RR","ci.lb","ci.lb","P-val")
@@ -1429,45 +1438,15 @@ apply_tmle<-function(Ys,tr=d$tr,W=NULL,id=d$block, clusterid=d$clusterid, dataid
   return(res_list)
 }
 
-apply_glm<-function(Ys,tr=d$tr,id=d$block, measure="RR"){
-  contrasts<-list(c("Control","Sanitation"), c("Control","WSH"),c("Sanitation","WSH"))
-  
-  varlist<-colnames(Ys)
-  res_list<-NULL
-  for(i in 1:ncol(Ys)){
-    cat("#",i,": ",varlist[i],"\n")
-      if(measure=="RD"){
-        temp<-matrix(NA, length(contrasts), 6)
-      }else{
-        temp<-matrix(NA, length(contrasts), 12)
-      }
-    rownames(temp)<-c("Control v Sanitation","Control v WSH","Sanitation v WSH")
-    for(j in 1:length(contrasts)){
-      if(measure=="RD"){
-      temp[j,1:6]<-washb_glm(Y=Ys[,i], tr=tr, W=NULL, id=id, pair=NULL, family="gaussian", contrast= contrasts[[j]], seed=12345, print=F)$TR
-                colnames(temp)<-c("ATE","ci.lb","ci.lb","SE","Zval","P-val")
-      }
-      if(measure=="RR"){
-        temp[j,1:6]<-washb_glm(Y=Ys[,i], tr=tr, W=NULL, id=id, pair=NULL, family=binomial(link=`log`), contrast= contrasts[[j]], seed=12345, print=F)$TR
-        temp[j,7:12]<-washb_glm(Y=Ys[,i], tr=tr, W=NULL, id=id, pair=NULL, family="gaussian", contrast= contrasts[[j]], seed=12345, print=F)$TR
-
-        colnames(temp)<-c("ATE","ci.lb","ci.lb","SE","Zval","P-val","RR","ci.lb","ci.lb","SE","Zval","P-val")
-      }
-    }
-    res_list[[i]]<-temp
-    names(res_list)[[i]]<-varlist[i]
-  }
-  return(res_list)
-}
 
 #Create lists of Ws
 colnames(Y.pos)
-Wlist.pos<-list(W_wat,W_wat,W,W,W_food,W_soil,W,W_wat,W_wat,W,W,W_food,W_soil,W, W_fly, W, W)
+Wlist.pos<-list(W_wat,W,W,W,W_food,W_soil,W,W_wat,W,W,W,W_food,W_soil,W, W_fly, W, W)
 
 #Run adjusted TMLEs
 pos_adj<-apply_tmle(Ys=Y.pos,tr=d$tr,W=Wlist.pos,id=d$block, contrast=contrasts, family="binomial", measure="RR")
 
-    
+
       
       
 #Prevalence Ratio
@@ -1551,8 +1530,8 @@ ch_rd_h2_adj_M<-pos_adj[[17]][3,1:4]
 
 #Log count difference
 colnames(Y.log)
-Wlist.log<-list(W_wat,W_wat,W,W,W_food,W_soil,W,W_wat,W_wat,W,W,W_food,W_soil,W, W_fly)
-  
+#Wlist.log<-list(W_wat,W_wat,W,W,W_food,W_soil,W,W_wat,W_wat,W,W,W_food,W_soil,W, W_fly)
+Wlist.log<-list(W_wat,W,W,W,W_food,W_soil,W,W_wat,W,W,W,W_food,W_soil,W, W_fly)
 
 #Run adjusted TMLEs
 log_adj<-apply_tmle(Ys=Y.log, tr=d$tr,W=Wlist.log,id=d$block, contrast=contrasts, family="gaussian", measure="RD")
