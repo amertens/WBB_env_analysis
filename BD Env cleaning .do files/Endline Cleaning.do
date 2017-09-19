@@ -19,7 +19,8 @@ save `tr'
 
 
 cd "C:/Users/andre/Dropbox/WASHB EML/Data/5. Final Data"
-use "WASHB Env Full Endline Clean.dta", clear
+*use "WASHB Env Full Endline Clean.dta", clear
+use "WASHB Env Full Endline Clean_AE.dta", clear
 sort dataid
 
 
@@ -175,8 +176,23 @@ gen byte mhdirt = (q3mo_L_Nail==1 | q3mo_L_Palm==1 | q3mo_L_Finger==1 | q3mo_R_N
 gen byte chdirt = (q3ch_L_Nail==1 | q3ch_L_Palm==1 | q3ch_L_Finger==1 | q3ch_R_Nail==1 | q3ch_R_Palm==1 | q3ch_R_Finger==1)
 	replace chdirt = . if (q3ch_L_Nail==. & q3ch_L_Palm==. & q3ch_L_Finger==. & q3ch_R_Nail==. & q3ch_R_Palm==. & q3ch_R_Finger==.)
 
-keep dataid clusterid MonthCollectedH logecH logfcH ecposH fcposH MonthCollectedT logecT logfcT ecposT fcposT MonthCollectedW logecW logfcW ecposW fcposW sex date agem mhdirt chdirt numfly_kit numfly_lat flycaught_kit flycaught_lat logecF logfcF ecposF fcposF wet
+gen byte mhdirt_nail = (q3mo_L_Nail==1 | q3mo_R_Nail==1)
+gen byte mhdirt_fing = (q3mo_L_Finger==1 | q3mo_R_Finger==1)
+gen byte mhdirt_palm = (q3mo_L_Palm==1 | q3mo_R_Palm==1)
+gen byte chdirt_nail = (q3ch_L_Nail==1 | q3ch_R_Nail==1)
+gen byte chdirt_fing = (q3ch_L_Finger==1 | q3ch_R_Finger==1)
+gen byte chdirt_palm = (q3ch_L_Palm==1 | q3ch_R_Palm==1)
+replace mhdirt_nail =. if (q3mo_L_Nail==. & q3mo_R_Nail==.)
+replace mhdirt_fing =. if (q3mo_L_Finger==. & q3mo_R_Finger==.)
+replace mhdirt_palm =. if (q3mo_L_Palm==. & q3mo_R_Palm==.)
+replace chdirt_nail =. if (q3ch_L_Nail==. & q3ch_R_Nail==.)
+replace chdirt_fing =. if (q3ch_L_Finger==. & q3ch_R_Finger==.)
+replace chdirt_palm =. if (q3ch_L_Palm==. & q3ch_R_Palm==.)
 
+	
+*keep dataid clusterid MonthCollectedH logecH logfcH ecposH fcposH MonthCollectedT logecT logfcT ecposT fcposT MonthCollectedW logecW logfcW ecposW fcposW sex date agem mhdirt chdirt numfly_kit numfly_lat flycaught_kit flycaught_lat logecF logfcF ecposF fcposF wet
+
+/*Update with AE data
 gen dataid_str= string(dataid, "%05.0f")
 gen clusterid_new= substr(dataid_str, 1, 3)
 
@@ -184,7 +200,9 @@ gen clusterid_str= string(clusterid, "%03.0f")
 replace clusterid_str=clusterid_new if clusterid_str==""
 drop dataid_str clusterid
 rename clusterid_str clusterid
+*/
 sort clusterid
+
 
 
 

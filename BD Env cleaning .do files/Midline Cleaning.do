@@ -19,7 +19,8 @@ save `tr'
 
 
 cd "C:/Users/andre/Dropbox/WASHB EML/Data/5. Final Data"
-use "WASHB Env Full Midline Clean.dta", clear
+*use "WASHB Env Full Midline Clean.dta", clear
+use "WASHB Env Full Midline Clean_AE.dta", clear
 sort dataid
 
 
@@ -174,7 +175,21 @@ gen byte mhdirt = (q3_2mlnail==1 | q3_2mlpalm==1 | q3_2mlpad==1 | q3_2mrnail==1 
 gen byte chdirt = (q3_2chlnail==1 | q3_2chlpalm==1 | q3_2chlpad==1 | q3_2chrnail==1 | q3_2chrpalm==1 | q3_2chrpad==1)
 	replace chdirt = . if (q3_2chlnail==. & q3_2chlpalm==. & q3_2chlpad==. & q3_2chrnail==. & q3_2chrpalm==. & q3_2chrpad==.)
 
-keep dataid clusterid MonthCollectedH logecH logfcH ecposH fcposH MonthCollectedT logecT logfcT ecposT fcposT MonthCollectedW logecW logfcW ecposW fcposW sex date agem mhdirt chdirt numfly_kit numfly_lat flycaught_kit flycaught_lat wet
+	
+gen byte mhdirt_nail = (q3_2mlnail==1 | q3_2mrnail==1)
+gen byte mhdirt_fing = (q3_2mlpad==1 | q3_2mrpad==1)
+gen byte mhdirt_palm = (q3_2mlpalm==1 | q3_2mrpalm==1)
+gen byte chdirt_nail = (q3_2chlnail==1 | q3_2chrnail==1)
+gen byte chdirt_fing = (q3_2chlpad==1 | q3_2chrpad==1)
+gen byte chdirt_palm = (q3_2chlpalm==1 | q3_2chrpalm==1)	
+replace mhdirt_nail = .  if (q3_2mlnail==. & q3_2mrnail==.)
+replace mhdirt_fing = .  if (q3_2mlpad==. & q3_2mrpad==.)
+replace mhdirt_palm = .  if (q3_2mlpalm==. & q3_2mrpalm==.)
+replace chdirt_nail = .  if (q3_2chlnail==. & q3_2chrnail==.)
+replace chdirt_fing = .  if (q3_2chlpad==. & q3_2chrpad==.)
+replace chdirt_palm = .  if (q3_2chlpalm==. & q3_2chrpalm==.)  
+	
+*keep dataid clusterid MonthCollectedH logecH logfcH ecposH fcposH MonthCollectedT logecT logfcT ecposT fcposT MonthCollectedW logecW logfcW ecposW fcposW sex date agem mhdirt chdirt numfly_kit numfly_lat flycaught_kit flycaught_lat wet
 
 gen test= string(dataid, "%05.0f")
 gen test2= substr(test, 1, 3)
@@ -189,6 +204,8 @@ merge clusterid using `tr'
 tab _merge
 keep if _merge==3
 codebook tr
+
+
 
 
 
