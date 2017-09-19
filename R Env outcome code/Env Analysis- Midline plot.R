@@ -34,11 +34,6 @@ for(i in 1:length(ays.res)) {
 }
 
 
-fly_prev_a
-fly_mn_a
-fly_rr_h1_unadj_a
-fly_rd_h1_unadj_a
-fly_dif_h1_unadj_a
 
 #-----------------------------------
 # World Bank prevalence processing
@@ -604,7 +599,7 @@ unique(prev.dat$TR)
 unique(prev.dat$round)
 prev.dat$Location<-factor(prev.dat$Location)
 table(prev.dat$Location)
-prev.dat$Location<-factor(prev.dat$Location, c("Tubewell", "Stored water", "Hands", "Toys", "Food", "Ponds", "Soil", "Flies","FlyCount"))
+prev.dat$Location<-factor(prev.dat$Location, c("Tubewell", "Stored water", "Hands", "Toys", "Food", "Ponds", "Soil", "Flies","FlyCount_kit", "FlyCount_lat"))
 table(prev.dat$Location)
 
 unique(pr.dat$Location)
@@ -612,7 +607,7 @@ unique(pr.dat$TR)
 unique(pr.dat$round)
 pr.dat$Location<-factor(pr.dat$Location)
 table(pr.dat$Location)
-pr.dat$Location<-factor(pr.dat$Location, c("Tubewell", "Stored water", "Hands", "Toys", "Food", "Ponds", "Soil", "Flies","FlyCount"))
+pr.dat$Location<-factor(pr.dat$Location, c("Tubewell", "Stored water", "Hands", "Toys", "Food", "Ponds", "Soil", "Flies","FlyCount_kit", "FlyCount_lat"))
 table(pr.dat$Location)
 
 unique(dif.dat$Location)
@@ -620,7 +615,7 @@ unique(dif.dat$TR)
 unique(dif.dat$round)
 dif.dat$Location<-factor(dif.dat$Location)
 table(dif.dat$Location)
-dif.dat$Location<-factor(dif.dat$Location, c("Tubewell", "Stored water", "Hands", "Toys", "Food", "Ponds", "Soil", "Flies","FlyCount"))
+dif.dat$Location<-factor(dif.dat$Location, c("Tubewell", "Stored water", "Hands", "Toys", "Food", "Ponds", "Soil", "Flies","FlyCount_kit", "FlyCount_lat"))
 table(dif.dat$Location)
 
 
@@ -634,17 +629,17 @@ table(dif.dat$Location)
 prevplot<-function(d, i){
   
   
-  xlabel_indices <- c(1,9,11,19,21,29)
-  xaxis_indices <- c(2,10,12,20,22,30)
-  xaxis_indices_primary <- c(1,11,21)
+  xlabel_indices <- c(1,6,9,14,17,22)
+  xaxis_indices <- c(2,7,10,15,18,23)
+  xaxis_indices_primary <- c(1,9,17)
   
 
   if(nrow(d)==0){
        op <- par(mar=c(1,1,6,0)+0.1)
     	ulabplot("")
     	
-         mtext(ifelse(i<11,
-                      c("Tubewell", "Stored water", "Hands", "Food", "Ponds", "Soil", "Flies","","Fly count")[i-1],
+         mtext(ifelse(i<9,
+                      c("Tubewell", "Stored water", "Hands","Toys","","Kitchen", "Latrine")[i-1],
                         ""),
                         side=3,line=0.25,col="gray20",cex=1)
 
@@ -678,7 +673,6 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	}
 	#Vector of arms to plot:
 	which.arms<-arms %in% d$TR
-	#pos<-MidPts[which.arms]
 	num.arms<-sum(which.arms)
 	if(num.arms==2){pos=c(MidPts[2],MidPts[4])}
 	if(num.arms==3){pos=c(MidPts[1],MidPts[3],MidPts[5])}
@@ -696,21 +690,22 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
   	mtext(d$TR, side=1,line=0.5,at=pos,col=cols[which.arms],cex=textsize,las=1)
 
 	  # X-axis labels
-		if(i==2 | i==10){
+		if(i==2 | i==7){
   mtext(text="",side=1,line=0.5,at=-1.35,col=cblack,cex=textsize,las=1)
   mtext(text=c("N",d$N),side=3,line=2.25,at=c(-1,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
   mtext(text=c("Prevalence (%)",d$Prevalence),side=3,line=1.25,at=c(-2.6,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
   if(i==2) mtext(text=c("Log10 Mean",sprintf("%1.2f",d$log10)),side=3,line=0.25,at=c(-2.35,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
-  if(i==10) mtext(text=c("Mean count",sprintf("%1.2f",d$log10)),side=3,line=0.25,at=c(-2.35,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
-  		}else{
+  if(i==7) mtext(text=c("Mean count",sprintf("%1.2f",d$log10)),side=3,line=0.25,at=c(-2.35,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
+      }else{
 		mtext(d$N, side=3,line=2.25,at=pos,col=cols[which.arms],cex=textsize,las=1)
     mtext(d$Prevalence, side=3,line=1.25, at=pos,col=cols[which.arms],cex=textsize,las=1)
     mtext(sprintf("%1.2f",d$log10), side=3,line=0.25, at=pos,col=cols[which.arms],cex=textsize,las=1)
 		}
-           mtext(ifelse(i<11,
-                      c("Tubewell", "Stored water", "Hands", "Food", "Ponds", "Soil", "Flies","","Fly count")[i-1],
+          mtext(ifelse(i<9,
+                      c("Tubewell", "Stored water", "Hands","Toys","","Kitchen", "Latrine")[i-1],
                         ""),
                         side=3,line=3.5,col="gray20",cex=1)
+
 
   }
 }
@@ -726,9 +721,9 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 
 prplot<-function(d, i){
   
-  xlabel_indices <- c(1,9,11,19,21,29)
-  xaxis_indices <- c(2,10,12,20,22,30)
-  xaxis_indices_primary <- c(1,11,21)
+  xlabel_indices <- c(1,6,9,14,17,22)
+  xaxis_indices <- c(2,7,10,15,18,23)
+  xaxis_indices_primary <- c(1,9,17)
   
   if(nrow(d)==0){
        op <- par(mar=c(1,1,4,0)+0.1)
@@ -753,7 +748,6 @@ if(i %in% xlabel_indices){
    ulabplot("Fly\nprevalence\nratio")
   }
 
-   	#,side=2,line=3,las=1)
 
 	}else{
    op <- par(mar=c(1.5,1,4,0)+0.1)
@@ -781,7 +775,8 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	                      MidPts[5] - (MidPts[5]-MidPts[1])/3,
                         MidPts[5])}
 
-
+	
+	
 	textsize=0.7 #<-------adjust text size here
 	# plot estimates
 	arrows(x0=pos, y0=d$lower.ci, y1=d$upper.ci, col=cols[which.arms],lwd=2,length=0.05,angle=90,code=3)
@@ -793,7 +788,7 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
  		if(i %in% xaxis_indices){
  		    mtext(text="",side=1,line=0.5,at=-1.35,col=cblack,cex=textsize,las=1)
     }
-  	
+
            mtext(ifelse(i<10,
                       c("Tubewell", "Stored water", "Hands", "Food", "Ponds", "Soil", "Flies")[i-1],
                         ""),
@@ -810,9 +805,9 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 
 diffplot<-function(d, i){
   
-  xlabel_indices <- c(1,9,11,19,21,29)
-  xaxis_indices <- c(2,10,12,20,22,30)
-  xaxis_indices_primary <- c(1,11,21)
+  xlabel_indices <- c(1,6,9,14,17,22)
+  xaxis_indices <- c(2,7,10,15,18,23)
+  xaxis_indices_primary <- c(1,9,17)
   
   if(nrow(d)==0){
        op <- par(mar=c(1,1,4,0)+0.1)
@@ -826,7 +821,7 @@ diffplot<-function(d, i){
   }else{
   
   ytics <- seq(-1.2,0.6,by=.2)  #<----------Set the Y-axis range here
-  if(i==30){ytics <- seq(0.6,3,by=.4)}
+  if(i>22){ytics <- seq(0.4,1.4,by=.2)}
   ytics<-round(ytics,2)
 
 if(i %in% xlabel_indices){
@@ -849,13 +844,12 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
   box()
 	segments(x0=0,x1=max(MidPts+0.5),y0=ytics[-1],lty=2,lwd=1,col="gray80")
 	segments(x0=0,x1=max(MidPts+0.5),y0=0,lty=1,lwd=1,col="black")
-	if(i==30){segments(x0=0,x1=max(MidPts+0.5),y0=1,lty=1,lwd=1,col="black")}
+	if(i>22){segments(x0=0,x1=max(MidPts+0.5),y0=1,lty=1,lwd=1,col="black")}
 		if(i %in% xaxis_indices){
 	    axis(2,at=ytics,las=1)
 	}
 	#Vector of arms to plot:
 	which.arms<-arms %in% d$TR
-	#pos<-MidPts[which.arms]
 	num.arms<-sum(which.arms)
 	if(num.arms==1){pos=c(MidPts[4])}
 	if(num.arms==2){pos=c(MidPts[3],MidPts[5])}
@@ -864,8 +858,6 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	                      MidPts[5] - (MidPts[5]-MidPts[1])/3,
                         MidPts[5])}
 
-
-	
 	textsize=0.7 #<-------adjust text size here
 	# plot estimates
 	arrows(x0=pos, y0=d$lower.ci, y1=d$upper.ci, col=cols[which.arms],lwd=2,length=0.05,angle=90,code=3)
@@ -875,7 +867,6 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 
 	  # X-axis labels
   	 		if(i %in% xaxis_indices){
- 		    #mtext(text="Arm",side=1,line=0.5,at=-1.35,col=cblack,cex=textsize,las=1)
   	 		mtext(text="",side=1,line=0.5,at=-1.35,col=cblack,cex=textsize,las=1)
     }
 
@@ -892,14 +883,15 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 
 
 
+
+
   
 setwd("C:/Users/andre/Dropbox/WASHB EML/Results/Figures")
-pdf("EnvAnalysisWBplot.pdf",width=10,height=8.5, paper="USr")
+pdf("EnvAnalysisMidlinePlot.pdf",width=10,height=8.5, paper="USr")
 
 
-m <- rbind(c(1,2,3,4,5,6,7,8,9,10),
-           c(11,12,13,14,15,16,17,18,19,20), 
-           c(21,22,23,24,25,26,27,28,29,30))
+
+m <- rbind(c(1,2,3,4,5,6,7,8), c(9,10,11,12,13,14,15,16), c(17,18,19,20,21,22,23,24))
 
 
 par(xpd=NA)
@@ -907,84 +899,63 @@ par(xpd=NA)
 layout(m)
 
 
-    i<-c(1,1,1)
+    i<-c(1,2,1)
     prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(1,1,2)
+    i<-c(1,2,2)
     prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(2,1,3)
+    i<-c(2,2,3)
     prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(3,1,4)
+    i<-c(3,2,4)
     prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(5,1,5)
+    i<-c(4,2,5)
     prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(6,1,6)
+    i<-c(1,2,6)
     prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(7,1,7)
+    i<-c(9,2,7)
     prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(8,1,8)
+    i<-c(10,2,8)
     prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(1,1,9)
-    prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(9,1,10)
-    prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
- 
-    
-    i<-c(1,1,11)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(1,1,12)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(2,1,13)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(3,1,14)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(5,1,15)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(6,1,16)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(7,1,17)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(8,1,18)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(1,1,19)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(9,1,20)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
- 
+  
     
     
-    i<-c(1,1,21)
+    i<-c(1,2,9)
+    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
+    i<-c(1,2,10)
+    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
+    i<-c(2,2,11)
+    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
+    i<-c(3,2,12)
+    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
+    i<-c(4,2,13)
+    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
+    i<-c(1,2,14)
+    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
+    i<-c(9,2,15)
+    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
+    i<-c(10,2,16)
+    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
+
+    
+    
+    i<-c(1,2,17)
     diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(1,1,22)
+    i<-c(1,2,18)
     diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(2,1,23)
+    i<-c(2,2,19)
     diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(3,1,24)
+    i<-c(3,2,20)
     diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(5,1,25)
+    i<-c(4,2,21)
     diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(6,1,26)
+    i<-c(1,2,22)
     diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(7,1,27)
+    i<-c(9,2,23)
     diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(8,1,28)
-    diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(1,1,29)
-    diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(9,1,30)
+    i<-c(10,2,24)
     diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
 
+    
 dev.off()
 
 
 
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
