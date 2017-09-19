@@ -90,6 +90,13 @@ mh_prev_M<-d  %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$mhdirt, id=.$
 ch_prev_M<-d  %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$chdirt, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
 
 
+
+
+
+
+
+
+
 ########################
 #Means and 95% CI by arm
 ########################
@@ -169,7 +176,11 @@ d<-d[order(d$block,d$clusterid,d$dataid),]
 #Create lists of outcomes
 Y.pos<-subset(d, select=c(ecposTW,ecposSW,ecposP,ecposH,ecposF,ecposS,ecposY,
          fcposTW,fcposSW,fcposP,fcposH,fcposF,fcposS,fcposY,
-         flycaught,mhdirt,chdirt))
+         flycaught,mhdirt,chdirt, mhdirt_nail, mhdirt_fing, mhdirt_palm, chdirt_nail, chdirt_fing, chdirt_palm
+         ))
+
+  
+
 
 
 
@@ -204,6 +215,13 @@ fc_y_rr_h1_unadj_M<-pos_unadj[[14]][1:2,1:7]
 fly_rr_h1_unadj_M<-pos_unadj[[15]][1:2,1:7]
 mh_rr_h1_unadj_M<-pos_unadj[[16]][1:2,1:7]
 ch_rr_h1_unadj_M<-pos_unadj[[17]][1:2,1:7]
+mh_nail_rr_h1_unadj_M<-pos_unadj[[18]][1:2,1:7]
+mh_fing_rr_h1_unadj_M<-pos_unadj[[19]][1:2,1:7]
+mh_palm_rr_h1_unadj_M<-pos_unadj[[20]][1:2,1:7]
+ch_nail_rr_h1_unadj_M<-pos_unadj[[21]][1:2,1:7]
+ch_fing_rr_h1_unadj_M<-pos_unadj[[22]][1:2,1:7]
+ch_palm_rr_h1_unadj_M<-pos_unadj[[23]][1:2,1:7]
+
 
 #(H2): combined WSH vs. sanitation.
 ec_tw_rr_h2_unadj_M<-pos_unadj[[1]][3,1:7]
@@ -223,6 +241,14 @@ fc_y_rr_h2_unadj_M<-pos_unadj[[14]][3,1:7]
 fly_rr_h2_unadj_M<-pos_unadj[[15]][3,1:7]
 mh_rr_h2_unadj_M<-pos_unadj[[16]][3,1:7]
 ch_rr_h2_unadj_M<-pos_unadj[[17]][3,1:7]
+mh_nail_rr_h2_unadj_M<-pos_unadj[[18]][3,1:7]
+mh_fing_rr_h2_unadj_M<-pos_unadj[[19]][3,1:7]
+mh_palm_rr_h2_unadj_M<-pos_unadj[[20]][3,1:7]
+ch_nail_rr_h2_unadj_M<-pos_unadj[[21]][3,1:7]
+ch_fing_rr_h2_unadj_M<-pos_unadj[[22]][3,1:7]
+ch_palm_rr_h2_unadj_M<-pos_unadj[[23]][3,1:7]
+
+
 
 #Prevalence Difference-unadjusted
 #(h1): sanitation vs. control, combined WSH vs. control  
@@ -243,6 +269,12 @@ fc_y_rd_h1_unadj_M<-pos_unadj[[14]][1:2,8:13]
 fly_rd_h1_unadj_M<-pos_unadj[[15]][1:2,8:13]
 mh_rd_h1_unadj_M<-pos_unadj[[16]][1:2,8:13]
 ch_rd_h1_unadj_M<-pos_unadj[[17]][1:2,8:13]
+mh_nail_rd_h1_unadj_M<-pos_unadj[[18]][1:2,8:13]
+mh_fing_rd_h1_unadj_M<-pos_unadj[[19]][1:2,8:13]
+mh_palm_rd_h1_unadj_M<-pos_unadj[[20]][1:2,8:13]
+ch_nail_rd_h1_unadj_M<-pos_unadj[[21]][1:2,8:13]
+ch_fing_rd_h1_unadj_M<-pos_unadj[[22]][1:2,8:13]
+ch_palm_rd_h1_unadj_M<-pos_unadj[[23]][1:2,8:13]
 
 #(H2): combined WSH vs. sanitation.
 ec_tw_rd_h2_unadj_M<-pos_unadj[[1]][3,8:13]
@@ -262,7 +294,12 @@ fc_y_rd_h2_unadj_M<-pos_unadj[[14]][3,8:13]
 fly_rd_h2_unadj_M<-pos_unadj[[15]][3,8:13]
 mh_rd_h2_unadj_M<-pos_unadj[[16]][3,8:13]
 ch_rd_h2_unadj_M<-pos_unadj[[17]][3,8:13]
-
+mh_nail_rd_h2_unadj_M<-pos_unadj[[18]][3,8:13]
+mh_fing_rd_h2_unadj_M<-pos_unadj[[19]][3,8:13]
+mh_palm_rd_h2_unadj_M<-pos_unadj[[20]][3,8:13]
+ch_nail_rd_h2_unadj_M<-pos_unadj[[21]][3,8:13]
+ch_fing_rd_h2_unadj_M<-pos_unadj[[22]][3,8:13]
+ch_palm_rd_h2_unadj_M<-pos_unadj[[23]][3,8:13]
 
 
 #Differences in log-counts-unadjusted
@@ -688,6 +725,12 @@ fc_y_prev_M,
 fly_prev_M,
 mh_prev_M,
 ch_prev_M,
+mh_nail_prev_M,
+mh_fing_prev_M,
+mh_palm_prev_M,
+ch_nail_prev_M,
+ch_fing_prev_M,
+ch_palm_prev_M,
 file="Env_Prevalence_Andrew_WB.Rdata")
 
 
@@ -900,6 +943,37 @@ fc_s_dif_h2_unadj_M,
 fc_y_dif_h2_unadj_M,
 fly_dif_h2_unadj_M,
 file="Env_Count_Diff_unadj_Andrew_WB.Rdata")
+
+
+#Save child and mom hand dirtiness stratified by hand location
+save(
+mh_nail_rr_h1_unadj_M,
+mh_fing_rr_h1_unadj_M,
+mh_palm_rr_h1_unadj_M,
+ch_nail_rr_h1_unadj_M,
+ch_fing_rr_h1_unadj_M,
+ch_palm_rr_h1_unadj_M,
+mh_nail_rr_h2_unadj_M,
+mh_fing_rr_h2_unadj_M,
+mh_palm_rr_h2_unadj_M,
+ch_nail_rr_h2_unadj_M,
+ch_fing_rr_h2_unadj_M,
+ch_palm_rr_h2_unadj_M,
+mh_nail_rd_h1_unadj_M,
+mh_fing_rd_h1_unadj_M,
+mh_palm_rd_h1_unadj_M,
+ch_nail_rd_h1_unadj_M,
+ch_fing_rd_h1_unadj_M,
+ch_palm_rd_h1_unadj_M,
+mh_nail_rd_h2_unadj_M,
+mh_fing_rd_h2_unadj_M,
+mh_palm_rd_h2_unadj_M,
+ch_nail_rd_h2_unadj_M,
+ch_fing_rd_h2_unadj_M,
+ch_palm_rd_h2_unadj_M,
+file="Env_M_C_hand_unadj_Andrew_WB.Rdata")
+
+
 
 
 

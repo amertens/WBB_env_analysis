@@ -114,10 +114,22 @@ fly_kit_prev_end_M<-d  %>% subset(tr!="Water" & tr!="Handwashing") %>% group_by(
 fly_lat_prev_end_M<-d  %>% subset(tr!="Water" & tr!="Handwashing") %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$flycaught_lat, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
 mh_prev_end_M<-d  %>% subset(tr!="Water") %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$mhdirt, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
 ch_prev_end_M<-d  %>% subset(tr!="Water")  %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$chdirt, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
+mh_nail_prev_end_M <-d  %>% subset(tr!="Water")  %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$mhdirt_nail, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
+mh_fing_prev_end_M <-d  %>% subset(tr!="Water")  %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$mhdirt_fing, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
+mh_palm_prev_end_M <-d  %>% subset(tr!="Water")  %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$mhdirt_palm, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
+ch_nail_prev_end_M <-d  %>% subset(tr!="Water")  %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$chdirt_nail, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
+ch_fing_prev_end_M <-d  %>% subset(tr!="Water")  %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$chdirt_fing, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
+ch_palm_prev_end_M <-d  %>% subset(tr!="Water")  %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$chdirt_palm, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
+
+
+
+
 
 ec_f_prev_end_M<-d %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$ecposF, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
 #fc_f_prev_end_M<-d %>% group_by(tr) %>% do(as.data.frame(washb_mean(Y=.$fcposF, id=.$block, print = F))) %>% ungroup %>% as.data.frame %>% `rownames<-`(.[,1]) %>% .[,-1] 
 
+table(is.na(d$logecF))
+table(is.na(d$ecposF))
 
 ########################
 #Means and 95% CI by arm
@@ -194,39 +206,17 @@ d<-d[order(d$block,d$clusterid,d$dataid),]
 
 #Create lists of outcomes
 Y.pos<-subset(d, select=c(ecposT,ecposH,ecposW,fcposT,fcposH,fcposW,
-         flycaught_kit,flycaught_lat,mhdirt,chdirt,ecposF))
+         flycaught_kit,flycaught_lat,mhdirt,chdirt,ecposF,
+         mhdirt_nail, mhdirt_fing, mhdirt_palm, chdirt_nail, chdirt_fing, chdirt_palm))
 Y.log<-subset(d, select=c(logecT, logecH, logecW, logfcT, logfcH, logfcW, numfly_kit,numfly_lat,logecF))
 
 contrast1=list(c("C+N pooled","Water"),c("C+N pooled","Handwashing"),c("C+N pooled","WSH+WSHN pooled"),c("Water","WSH+WSHN pooled"),c("Handwashing","WSH+WSHN pooled"))
 contrast2=list(c("C+N pooled","WSH+WSHN pooled"))
 contrast3=list(c("C+N pooled","Handwashing"),c("C+N pooled","WSH+WSHN pooled"),c("Handwashing","WSH+WSHN pooled"))
 contrast4=list(c("C+N pooled","Water"),c("C+N pooled","WSH+WSHN pooled"),c("Water","WSH+WSHN pooled"))
-Y.pos.contrasts<-list(contrast2,contrast3,contrast4,contrast2,contrast3,contrast4,contrast2,contrast2,contrast3,contrast3,contrast1)
+Y.pos.contrasts<-list(contrast2,contrast3,contrast4,contrast2,contrast3,contrast4,contrast2,contrast2,contrast3,contrast3,contrast1,contrast3,contrast3,contrast3,contrast3,contrast3,contrast3)
 Y.log.contrasts<-list(contrast2,contrast3,contrast4,contrast2,contrast3,contrast4,contrast2,contrast2,contrast1)
 
-
-
-
-
-#Water
-#envw=env[which(env$tr!="Handwashing"),]
-#envw$tr=droplevels(envw$tr)
-#envw$tr=factor(envw$tr,levels=c("Control","Nutrition","Water","WSH","Nutrition + WSH"))
-
-#Hands
-#envh=env[which(env$tr!="Water"),]
-#envh$tr=droplevels(envh$tr)
-#envh$tr=factor(envh$tr,levels=c("Control","Nutrition","Handwashing","WSH","Nutrition + WSH"))
-
-#Toys
-#envt=env[which(env$tr!="Water" & env$tr!="Handwashing"),]
-#envt$tr=droplevels(envt$tr)
-#envt$tr=factor(envh$tr,levels=c("Control","Nutrition","WSH","Nutrition + WSH"))
-
-#Flies
-#envy=env[which(env$tr!="Water" & env$tr!="Handwashing"),]
-#envy$tr=droplevels(envy$tr)
-#envy$tr=factor(envy$tr,levels=c("Control","Nutrition","WSH","Nutrition + WSH"))
 
 
 #------------
@@ -248,8 +238,12 @@ fly_lat_rr_h1_unadj_end_M<-pos_unadj[[8]][1,1:7]
 mh_rr_h1_unadj_end_M<-pos_unadj[[9]][1:2,1:7]
 ch_rr_h1_unadj_end_M<-pos_unadj[[10]][1:2,1:7]
 ec_f_rr_h1_unadj_end_M<-pos_unadj[[11]][1:3,1:7]
-#fc_f_rr_h1_unadj_end_M<-pos_unadj[[12]][1:3,1:7]
-
+mh_nail_rr_h1_unadj_end_M<-pos_unadj[[12]][1:2,1:7]
+mh_fing_rr_h1_unadj_end_M<-pos_unadj[[13]][1:2,1:7]
+mh_palm_rr_h1_unadj_end_M<-pos_unadj[[14]][1:2,1:7]
+ch_nail_rr_h1_unadj_end_M<-pos_unadj[[15]][1:2,1:7]
+ch_fing_rr_h1_unadj_end_M<-pos_unadj[[16]][1:2,1:7]
+ch_palm_rr_h1_unadj_end_M<-pos_unadj[[17]][1:2,1:7]
 
 #(H2): combined WSH vs. sanitation.
 #ec_t_rr_h2_unadj_end_M<-pos_unadj[[1]][4:5,1:7]
@@ -262,7 +256,13 @@ fc_dw_rr_h2_unadj_end_M<-pos_unadj[[6]][3,1:7]
 mh_rr_h2_unadj_end_M<-pos_unadj[[9]][3,1:7]
 ch_rr_h2_unadj_end_M<-pos_unadj[[10]][3,1:7]
 ec_f_rr_h2_unadj_end_M<-pos_unadj[[11]][4:5,1:7]
-#fc_f_rr_h2_unadj_end_M<-pos_unadj[[12]][4:5,1:7]
+mh_nail_rr_h2_unadj_end_M<-pos_unadj[[12]][3,1:7]
+mh_fing_rr_h2_unadj_end_M<-pos_unadj[[13]][3,1:7]
+mh_palm_rr_h2_unadj_end_M<-pos_unadj[[14]][3,1:7]
+ch_nail_rr_h2_unadj_end_M<-pos_unadj[[15]][3,1:7]
+ch_fing_rr_h2_unadj_end_M<-pos_unadj[[16]][3,1:7]
+ch_palm_rr_h2_unadj_end_M<-pos_unadj[[17]][3,1:7]
+
 
 #Prevalence Difference-unadjusted
 #(h1): sanitation vs. control, combined WSH vs. control  
@@ -277,8 +277,12 @@ fly_lat_rd_h1_unadj_end_M<-pos_unadj[[8]][1,8:13]
 mh_rd_h1_unadj_end_M<-pos_unadj[[9]][1:2,8:13]
 ch_rd_h1_unadj_end_M<-pos_unadj[[10]][1:2,8:13]
 ec_f_rd_h1_unadj_end_M<-pos_unadj[[11]][1:3,8:13]
-#fc_f_rd_h1_unadj_end_M<-pos_unadj[[12]][1:3,8:13]
-
+mh_nail_rd_h1_unadj_end_M<-pos_unadj[[12]][1:2,8:13]
+mh_fing_rd_h1_unadj_end_M<-pos_unadj[[13]][1:2,8:13]
+mh_palm_rd_h1_unadj_end_M<-pos_unadj[[14]][1:2,8:13]
+ch_nail_rd_h1_unadj_end_M<-pos_unadj[[15]][1:2,8:13]
+ch_fing_rd_h1_unadj_end_M<-pos_unadj[[16]][1:2,8:13]
+ch_palm_rd_h1_unadj_end_M<-pos_unadj[[17]][1:2,8:13]
 
 #(H2): combined WSH vs. sanitation.
 #ec_t_rd_h2_unadj_end_M<-pos_unadj[[1]][4:5,8:13]
@@ -291,8 +295,12 @@ fc_dw_rd_h2_unadj_end_M<-pos_unadj[[6]][3,8:13]
 mh_rd_h2_unadj_end_M<-pos_unadj[[9]][3,8:13]
 ch_rd_h2_unadj_end_M<-pos_unadj[[10]][3,8:13]
 ec_f_rd_h2_unadj_end_M<-pos_unadj[[11]][4:5,8:13]
-#fc_f_rd_h2_unadj_end_M<-pos_unadj[[12]][4:5,8:13]
-
+mh_nail_rd_h2_unadj_end_M<-pos_unadj[[12]][3,8:13]
+mh_fing_rd_h2_unadj_end_M<-pos_unadj[[13]][3,8:13]
+mh_palm_rd_h2_unadj_end_M<-pos_unadj[[14]][3,8:13]
+ch_nail_rd_h2_unadj_end_M<-pos_unadj[[15]][3,8:13]
+ch_fing_rd_h2_unadj_end_M<-pos_unadj[[16]][3,8:13]
+ch_palm_rd_h2_unadj_end_M<-pos_unadj[[17]][3,8:13]
 
 log_unadj<-apply_glm(Ys=Y.log,tr=d$tr.pool,id=d$block, contrasts.list=Y.log.contrasts, measure="RD")
 
@@ -338,7 +346,12 @@ fly_lat_prev_end_M,
 mh_prev_end_M,
 ch_prev_end_M,
 ec_f_prev_end_M,
-#fc_f_prev_end_M,
+mh_nail_prev_end_M,
+mh_fing_prev_end_M,
+mh_palm_prev_end_M,
+ch_nail_prev_end_M,
+ch_fing_prev_end_M,
+ch_palm_prev_end_M,
 file="Env_Prevalence_Andrew_end.Rdata")
 
 
@@ -425,6 +438,34 @@ ec_f_dif_h2_unadj_end_M,
 #fc_f_dif_h2_unadj_end_M,
 file="Env_Count_Diff_unadj_Andrew_end.Rdata")
 
+
+#Save child and mom hand dirtiness stratified by hand location
+save(
+mh_nail_rr_h1_unadj_end_M,
+mh_fing_rr_h1_unadj_end_M,
+mh_palm_rr_h1_unadj_end_M,
+ch_nail_rr_h1_unadj_end_M,
+ch_fing_rr_h1_unadj_end_M,
+ch_palm_rr_h1_unadj_end_M,
+mh_nail_rr_h2_unadj_end_M,
+mh_fing_rr_h2_unadj_end_M,
+mh_palm_rr_h2_unadj_end_M,
+ch_nail_rr_h2_unadj_end_M,
+ch_fing_rr_h2_unadj_end_M,
+ch_palm_rr_h2_unadj_end_M,
+mh_nail_rd_h1_unadj_end_M,
+mh_fing_rd_h1_unadj_end_M,
+mh_palm_rd_h1_unadj_end_M,
+ch_nail_rd_h1_unadj_end_M,
+ch_fing_rd_h1_unadj_end_M,
+ch_palm_rd_h1_unadj_end_M,
+mh_nail_rd_h2_unadj_end_M,
+mh_fing_rd_h2_unadj_end_M,
+mh_palm_rd_h2_unadj_end_M,
+ch_nail_rd_h2_unadj_end_M,
+ch_fing_rd_h2_unadj_end_M,
+ch_palm_rd_h2_unadj_end_M,
+file="Env_M_C_hand_unadj_Andrew_mid.Rdata")
 
 
 
