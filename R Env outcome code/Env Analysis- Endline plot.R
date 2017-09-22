@@ -736,7 +736,7 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	las=1,bty="n"
 	)
   box()
-	segments(x0=0,x1=max(MidPts+0.75),y0=ytics[-1],lty=2,lwd=1,col="gray80")
+	segments(x0=0,x1=6.2,y0=ytics[-1],lty=2,lwd=1,col="gray80")
 	if(i %in% xaxis_indices){
 	    axis(2,at=ytics,las=1)
 	}
@@ -771,9 +771,9 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
     mtext(sprintf("%1.2f",d$log10), side=3,line=0.25, at=pos,col=cols[which.arms],cex=textsize,las=1)
 		}
          mtext(ifelse(i<10,
-                      c("Tubewell", "Stored water", "Hands","Toys","Food","","Kitchen", "Latrine")[i-1],
+                      c("Tubewell", "Stored water", "Hands","Toys","Food","","Kitchen\nfly count", "Latrine\nfly count")[i-1],
                         ""),
-                        side=3,line=3.5,col="gray20",cex=1)
+                        side=3,line=3.5,col="gray20",cex=0.95)
 
   }
 }
@@ -826,8 +826,8 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	las=1,bty="n"
 	)
   box()
-	segments(x0=0,x1=max(MidPts+0.75),y0=ytics[-1],lty=2,lwd=1,col="gray80")
-	segments(x0=0,x1=max(MidPts+0.75),y0=1,lty=1,lwd=1,col="black")
+	segments(x0=0,x1=6.2,y0=ytics[-1],lty=2,lwd=1,col="gray80")
+	segments(x0=0,x1=6.2,y0=1,lty=1,lwd=1,col="black")
 
 		if(i %in% xaxis_indices){
 	    axis(2,at=ytics,las=1)
@@ -888,8 +888,8 @@ diffplot<-function(d, i){
 
   }else{
   
-  ytics <- seq(-1.4,0.4,by=.2)  #<----------Set the Y-axis range here
-  if(i>25){ytics <- seq(0.4,1.6,by=.2)}
+  ytics <- seq(-1.4,0.6,by=.2) #<----------Set the Y-axis range here
+  if(i>25){ytics <- seq(0.2,3,by=.4)}
   ytics<-round(ytics,2)
 
 if(i %in% xlabel_indices){
@@ -910,8 +910,8 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	las=1,bty="n"
 	)
   box()
-	segments(x0=0,x1=max(MidPts+0.75),y0=ytics[-1],lty=2,lwd=1,col="gray80")
-	segments(x0=0,x1=max(MidPts+0.75),y0=0,lty=1,lwd=1,col="black")
+	segments(x0=0,x1=6.2,y0=ytics[-1],lty=2,lwd=1,col="gray80")
+	if(i<26){segments(x0=0,x1=6.2,y0=0,lty=1,lwd=1,col="black")}
 	if(i>25){segments(x0=0,x1=max(MidPts+0.75),y0=1,lty=1,lwd=1,col="black")}
 		if(i %in% xaxis_indices){
 	    axis(2,at=ytics,las=1)
@@ -951,79 +951,6 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 
 
 
-
-
-  
-setwd("C:/Users/andre/Dropbox/WASHB EML/Results/Figures")
-pdf("EnvAnalysisMidlinePlot.pdf",width=10,height=8.5, paper="USr")
-
-
-
-m <- rbind(c(1,2,3,4,5,6,7,8), c(9,10,11,12,13,14,15,16), c(17,18,19,20,21,22,23,24))
-
-
-par(xpd=NA)
-
-layout(m)
-
-
-    i<-c(1,2,1)
-    prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(1,2,2)
-    prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(2,2,3)
-    prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(3,2,4)
-    prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(4,2,5)
-    prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(1,2,6)
-    prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(9,2,7)
-    prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-    i<-c(10,2,8)
-    prevplot(d=prev.dat[prev.dat$Location==levels(prev.dat$Location)[i[1]] & prev.dat$round==unique(prev.dat$round)[i[2]],], i[3])
-  
-    
-    
-    i<-c(1,2,9)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(1,2,10)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(2,2,11)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(3,2,12)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(4,2,13)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(1,2,14)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(9,2,15)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-    i<-c(10,2,16)
-    prplot(d=pr.dat[pr.dat$Location==levels(pr.dat$Location)[i[1]] & pr.dat$round==unique(pr.dat$round)[i[2]],], i[3])
-
-    
-    
-    i<-c(1,2,17)
-    diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(1,2,18)
-    diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(2,2,19)
-    diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(3,2,20)
-    diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(4,2,21)
-    diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(1,2,22)
-    diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(9,2,23)
-    diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-    i<-c(10,2,24)
-    diffplot(d=dif.dat[dif.dat$Location==levels(dif.dat$Location)[i[1]] & dif.dat$round==unique(dif.dat$round)[i[2]],], i[3])
-
-    
-dev.off()
 
 
 

@@ -639,7 +639,7 @@ prevplot<-function(d, i){
     	ulabplot("")
     	
          mtext(ifelse(i<9,
-                      c("Tubewell", "Stored water", "Hands","Toys","","Kitchen", "Latrine")[i-1],
+                      c("Tubewell", "Stored water", "Hands","Toys","","Kitchen\nfly count", "Latrine\nfly count")[i-1],
                         ""),
                         side=3,line=0.25,col="gray20",cex=1)
 
@@ -667,7 +667,7 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	las=1,bty="n"
 	)
   box()
-	segments(x0=0,x1=max(MidPts+0.5),y0=ytics[-1],lty=2,lwd=1,col="gray80")
+	segments(x0=0,x1=6.2,y0=ytics[-1],lty=2,lwd=1,col="gray80")
 	if(i %in% xaxis_indices){
 	    axis(2,at=ytics,las=1)
 	}
@@ -702,9 +702,9 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
     mtext(sprintf("%1.2f",d$log10), side=3,line=0.25, at=pos,col=cols[which.arms],cex=textsize,las=1)
 		}
           mtext(ifelse(i<9,
-                      c("Tubewell", "Stored water", "Hands","Toys","","Kitchen", "Latrine")[i-1],
+                      c("Tubewell", "Stored water", "Hands","Toys","","Kitchen\nfly count", "Latrine\nfly count")[i-1],
                         ""),
-                        side=3,line=3.5,col="gray20",cex=1)
+                        side=3,line=3.5,col="gray20",cex=0.95)
 
 
   }
@@ -758,8 +758,8 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	las=1,bty="n"
 	)
   box()
-	segments(x0=0,x1=max(MidPts+0.5),y0=ytics[-1],lty=2,lwd=1,col="gray80")
-	segments(x0=0,x1=max(MidPts+0.5),y0=1,lty=1,lwd=1,col="black")
+	segments(x0=0,x1=6.2,y0=ytics[-1],lty=2,lwd=1,col="gray80")
+	segments(x0=0,x1=6.2,y0=1,lty=1,lwd=1,col="black")
 
 		if(i %in% xaxis_indices){
 	    axis(2,at=ytics,las=1)
@@ -820,8 +820,8 @@ diffplot<-function(d, i){
 
   }else{
   
-  ytics <- seq(-1.2,0.6,by=.2)  #<----------Set the Y-axis range here
-  if(i>22){ytics <- seq(0.4,1.4,by=.2)}
+  ytics <- seq(-1.4,0.6,by=.2)  #<----------Set the Y-axis range here
+  if(i>22){ytics <- seq(0.2,3,by=.4)}
   ytics<-round(ytics,2)
 
 if(i %in% xlabel_indices){
@@ -842,8 +842,8 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	las=1,bty="n"
 	)
   box()
-	segments(x0=0,x1=max(MidPts+0.5),y0=ytics[-1],lty=2,lwd=1,col="gray80")
-	segments(x0=0,x1=max(MidPts+0.5),y0=0,lty=1,lwd=1,col="black")
+	segments(x0=0,x1=6.2,y0=ytics[-1],lty=2,lwd=1,col="gray80")
+	if(i<23){segments(x0=0,x1=6.2,y0=0,lty=1,lwd=1,col="black")}
 	if(i>22){segments(x0=0,x1=max(MidPts+0.5),y0=1,lty=1,lwd=1,col="black")}
 		if(i %in% xaxis_indices){
 	    axis(2,at=ytics,las=1)
