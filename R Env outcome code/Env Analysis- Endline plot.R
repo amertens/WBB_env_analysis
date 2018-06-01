@@ -806,6 +806,9 @@ prplot<-function(d, i){
   
     exp_tics<-seq(-1.75,1,by=.25) #<----------Set the Y-axis range here
     ytics <- round(2^exp_tics,2)
+               ytics <- c(0.25, 0.5, 1, 2)
+              labs = c("1/4","1/2","1","2")
+
 
 if(i %in% xlabel_indices){
    op <- par(mar=c(1,0,5,1)+0.1)
@@ -830,7 +833,7 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	segments(x0=0,x1=6.2,y0=1,lty=1,lwd=1,col="black")
 
 		if(i %in% xaxis_indices){
-	    axis(2,at=ytics,las=1)
+       axis(2,at=ytics,las=1, labels = labs)
 	}
 	#Vector of arms to plot:
 	which.arms<-arms %in% d$TR
@@ -889,9 +892,12 @@ diffplot<-function(d, i){
   }else{
   
   ytics <- seq(-1.4,0.6,by=.2) #<----------Set the Y-axis range here
+   labs = NULL 
   if(i>25){
         exp_tics<-seq(-1.5,1,by=.25)
     ytics <- round(2^exp_tics,2)
+               ytics <- c(0.25, 0.5, 1, 2)
+     labs = c("1/4","1/2","1","2")
     }
   ytics<-round(ytics,2)
 
@@ -923,8 +929,12 @@ ulabplot("E.coli\nlog 10\ndifference")
 	if(i<26){segments(x0=0,x1=6.2,y0=0,lty=1,lwd=1,col="black")}
 	if(i>25){segments(x0=0,x1=max(MidPts+0.75),y0=1,lty=1,lwd=1,col="black")}
 		if(i %in% xaxis_indices){
-	    axis(2,at=ytics,las=1)
-	}
+		  	if(is.null(labs)){
+	        axis(2,at=ytics,las=1)
+	      }else{
+	        	axis(2,at=ytics,las=1, labels = labs)
+	      }
+		  }
 	#Vector of arms to plot:
 	which.arms<-arms %in% d$TR
 	num.arms<-sum(which.arms)
