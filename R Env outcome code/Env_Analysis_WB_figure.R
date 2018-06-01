@@ -68,7 +68,7 @@ rownames(prev_wb)<-NULL
 colnames(prev_wb)<-c("Location","TR", "N", "Prevalence", "SD","Robust SE","lower.ci","upper.ci")
 
 levels(prev_wb$TR)<-c("C","S","WSH")
-prev_wb[,3:ncol(prev_wb)]<-round(prev_wb[,3:ncol(prev_wb)],2)
+#prev_wb[,3:ncol(prev_wb)]<-round(prev_wb[,3:ncol(prev_wb)],2)
 
 prev_wb$TR.N<-paste0(prev_wb$TR, "\n(N=\n",prev_wb$N,")")
 prev_wb$round<-"World Bank"
@@ -109,7 +109,7 @@ levels(prev_mid$TR)
 #levels(prev_mid$TR)<-c("C","N","WSH+N","W","WSH","H")
 levels(prev_mid$TR)<-c("C","W","WSH","H", "N", "WSH+N")
 
-prev_mid[,3:ncol(prev_mid)]<-round(prev_mid[,3:ncol(prev_mid)],2)
+#prev_mid[,3:ncol(prev_mid)]<-round(prev_mid[,3:ncol(prev_mid)],2)
 
 prev_mid$TR.N<-paste0(prev_mid$TR, "\n(N=\n",prev_mid$N,")")
 prev_mid$round<-"Year 1"
@@ -151,7 +151,7 @@ colnames(prev_end)<-c("Location","TR", "N", "Prevalence", "SD","Robust SE","lowe
 levels(prev_end$TR)
 levels(prev_end$TR)<-c("C","W","WSH","H", "N", "WSH+N")
 
-prev_end[,3:ncol(prev_end)]<-round(prev_end[,3:ncol(prev_end)],2)
+#prev_end[,3:ncol(prev_end)]<-round(prev_end[,3:ncol(prev_end)],2)
 
 prev_end$TR.N<-paste0(prev_end$TR, "\n(N=\n",prev_end$N,")")
 prev_end$round<-"Year 2"
@@ -197,7 +197,7 @@ rownames(mn_wb)<-NULL
 colnames(mn_wb)<-c("Location","TR", "N", "Mean Log Count", "SD","Robust SE","lower.ci","upper.ci")
 
 levels(mn_wb$TR)<-c("C","S","WSH")
-mn_wb[,3:ncol(mn_wb)]<-round(mn_wb[,3:ncol(mn_wb)],2)
+#mn_wb[,3:ncol(mn_wb)]<-round(mn_wb[,3:ncol(mn_wb)],2)
 
 mn_wb$TR.N<-paste0(mn_wb$TR, "\n(N=\n",mn_wb$N,")")
 mn_wb$round<-"World Bank"
@@ -229,7 +229,7 @@ rownames(mn_mid)<-NULL
 colnames(mn_mid)<-c("Location","TR", "N", "Mean Log Count", "SD","Robust SE","lower.ci","upper.ci")
 levels(mn_mid$TR)
 levels(mn_mid$TR)<-c("C","W","S","H","WSH","N","WSH+N")
-mn_mid[,3:ncol(mn_mid)]<-round(mn_mid[,3:ncol(mn_mid)],2)
+#mn_mid[,3:ncol(mn_mid)]<-round(mn_mid[,3:ncol(mn_mid)],2)
 
 mn_mid$TR.N<-paste0(mn_mid$TR, "\n(N=\n",mn_mid$N,")")
 mn_mid$round<-"Year 1"
@@ -265,7 +265,7 @@ colnames(mn_end)<-c("Location","TR", "N", "Mean Log Count", "SD","Robust SE","lo
 
 levels(mn_end$TR)
 levels(mn_end$TR)<-c("C","W","S","H","WSH","N","WSH+N")
-mn_end[,3:ncol(mn_end)]<-round(mn_end[,3:ncol(mn_end)],2)
+#mn_end[,3:ncol(mn_end)]<-round(mn_end[,3:ncol(mn_end)],2)
 
 mn_end$TR.N<-paste0(mn_end$TR, "\n(N=\n",mn_end$N,")")
 mn_end$round<-"Year 2"
@@ -320,7 +320,7 @@ pr_wb<-cbind(pr_wb[,1:2],prev_wb[prev_wb$TR!="C","N"],pr_wb[,3:9])
 colnames(pr_wb)<-c("Location","TR", "N", "PR","lower.ci","upper.ci","Estimate", "SD","Robust SE","P-value")
 levels(pr_wb$TR)
 levels(pr_wb$TR)<-c("S","WSH")
-pr_wb[,3:ncol(pr_wb)]<-round(pr_wb[,3:ncol(pr_wb)],2)
+#pr_wb[,3:ncol(pr_wb)]<-round(pr_wb[,3:ncol(pr_wb)],2)
 
 pr_wb$TR.N<-paste0(pr_wb$TR, "\n(N=\n",pr_wb$N,")")
 pr_wb$round<-"World Bank"
@@ -360,7 +360,7 @@ pr_mid<-cbind(pr_mid[,1:2],prev_mid[prev_mid$TR!="C","N"],pr_mid[,3:9])
 colnames(pr_mid)<-c("Location","TR", "N", "PR","lower.ci","upper.ci","Estimate", "SD","Robust SE","P-value")
 levels(pr_mid$TR)
 levels(pr_mid$TR)<-c("W","WSH","H")
-pr_mid[,3:ncol(pr_mid)]<-round(pr_mid[,3:ncol(pr_mid)],2)
+#pr_mid[,3:ncol(pr_mid)]<-round(pr_mid[,3:ncol(pr_mid)],2)
 
 pr_mid$TR.N<-paste0(pr_mid$TR, "\n(N=\n",pr_mid$N,")")
 pr_mid$round<-"Year 1"
@@ -401,7 +401,7 @@ pr_end<-cbind(pr_end[,1:2],prev_end[prev_end$TR!="C","N"],pr_end[,3:9])
 colnames(pr_end)<-c("Location","TR", "N", "PR","lower.ci","upper.ci","Estimate", "SD","Robust SE","P-value")
 levels(pr_end$TR)
 levels(pr_end$TR)<-c("W","WSH","H")
-pr_end[,3:ncol(pr_end)]<-round(pr_end[,3:ncol(pr_end)],2)
+#pr_end[,3:ncol(pr_end)]<-round(pr_end[,3:ncol(pr_end)],2)
 
 pr_end$TR.N<-paste0(pr_end$TR, "\n(N=\n",pr_end$N,")")
 pr_end$round<-"Year 2"
@@ -452,7 +452,7 @@ dif_wb<-cbind(dif_wb[,1:2],prev_wb[prev_wb$TR!="C","N"],dif_wb[,3:8])
 colnames(dif_wb)<-c("Location","TR", "N", "Dif","lower.ci","upper.ci", "SD","Robust SE")
 
 levels(dif_wb$TR)<-c("S","WSH")
-dif_wb[,3:ncol(dif_wb)]<-round(dif_wb[,3:ncol(dif_wb)],2)
+#dif_wb[,3:ncol(dif_wb)]<-round(dif_wb[,3:ncol(dif_wb)],2)
 
 dif_wb$TR.N<-paste0(dif_wb$TR, "\n(N=\n",dif_wb$N,")")
 dif_wb$round<-"World Bank"
@@ -495,7 +495,7 @@ dif_mid<-cbind(dif_mid[,1:2],prev_mid[prev_mid$TR!="C","N"],dif_mid[,3:8])
 colnames(dif_mid)<-c("Location","TR", "N", "Dif","lower.ci","upper.ci", "SD","Robust SE")
 levels(dif_mid$TR)
 levels(dif_mid$TR)<-c("W","WSH","H")
-dif_mid[,3:ncol(dif_mid)]<-round(dif_mid[,3:ncol(dif_mid)],2)
+#dif_mid[,3:ncol(dif_mid)]<-round(dif_mid[,3:ncol(dif_mid)],2)
 
 dif_mid$TR.N<-paste0(dif_mid$TR, "\n(N=\n",dif_mid$N,")")
 dif_mid$round<-"Year 1"
@@ -540,7 +540,7 @@ colnames(dif_end)<-c("Location","TR", "N", "Dif","lower.ci","upper.ci", "SD","Ro
 
 levels(dif_end$TR)
 levels(dif_end$TR)<-c("W","WSH","H")
-dif_end[,3:ncol(dif_end)]<-round(dif_end[,3:ncol(dif_end)],2)
+#dif_end[,3:ncol(dif_end)]<-round(dif_end[,3:ncol(dif_end)],2)
 
 dif_end$TR.N<-paste0(dif_end$TR, "\n(N=\n",dif_end$N,")")
 dif_end$round<-"Year 2"
@@ -568,9 +568,6 @@ dif.dat<-rbind(dif_wb,dif_mid, dif_end)
 #-------------------------------------------
 
 # main study colors
-# cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-# cols <- c("gray30",cbPalette[c(2:4,6:8)])
-# brighter color blind palette:  https://personal.sron.nl/~pault/ 
 cblack <- "#000004FF"
 cblue <- "#3366AA"
 cteal <- "#11AA99"
@@ -594,7 +591,7 @@ ulabplot <- function(title) {
        xaxt="n",xlab="",xlim=c(0,1),
        yaxt="n",ylab="",bty="n",ylim=c(0,1)
   )
-  text(1,0.5,title,adj=1,cex=1.5)
+  text(1,0.5,title,adj=1,cex=1.4, pos=2, offset = 0.5)
 }
 
 
@@ -698,13 +695,13 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	  # X-axis labels
 		if(i==2 | i==10){
   mtext(text="",side=1,line=0.5,at=-1.35,col=cblack,cex=textsize,las=1)
-  mtext(text=c("N",d$N),side=3,line=2.25,at=c(-1,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
-  mtext(text=c("Prevalence (%)",d$Prevalence),side=3,line=1.25,at=c(-2.6,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
-  if(i==2) mtext(text=c("Log10 Mean",sprintf("%1.2f",d$log10)),side=3,line=0.25,at=c(-2.35,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
-  if(i==10) mtext(text=c("Mean count",sprintf("%1.2f",d$log10)),side=3,line=0.25,at=c(-2.35,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
+  mtext(text=c("N",d$N),side=3,line=2.25,at=c(-1.5,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
+  mtext(text=c("Prevalence (%)",sprintf("%1.0f",d$Prevalence)),side=3,line=1.25,at=c(-3,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
+  if(i==2) mtext(text=c("Log10 Mean",sprintf("%1.2f",d$log10)),side=3,line=0.25,at=c(-2.8,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
+  if(i==10) mtext(text=c("Mean count",sprintf("%1.2f",d$log10)),side=3,line=0.25,at=c(-2.8,pos),col=c(cblack,cols[which.arms]),cex=textsize,las=1)
   		}else{
 		mtext(d$N, side=3,line=2.25,at=pos,col=cols[which.arms],cex=textsize,las=1)
-    mtext(d$Prevalence, side=3,line=1.25, at=pos,col=cols[which.arms],cex=textsize,las=1)
+    mtext(sprintf("%1.0f",d$Prevalence), side=3,line=1.25, at=pos,col=cols[which.arms],cex=textsize,las=1)
     mtext(sprintf("%1.2f",d$log10), side=3,line=0.25, at=pos,col=cols[which.arms],cex=textsize,las=1)
 		}
            mtext(ifelse(i<11,
@@ -724,7 +721,7 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 #-------------------------------------------
 
 
-prplot<-function(d, i){
+prplot<-function(d, i, log_ticks=F){
   
   xlabel_indices <- c(1,9,11,19,21,29)
   xaxis_indices <- c(2,10,12,20,22,30)
@@ -741,9 +738,10 @@ prplot<-function(d, i){
 
   }else{
   
-  ytics <- seq(0.2,1.8,by=.2)  #<----------Set the Y-axis range here
-
-
+    exp_tics<-seq(-1.75,1,by=.25) #<----------Set the Y-axis range here
+    ytics <- round(2^exp_tics,2)
+  
+  
 if(i %in% xlabel_indices){
    op <- par(mar=c(1,0,5,1)+0.1)
 
@@ -753,7 +751,6 @@ if(i %in% xlabel_indices){
    ulabplot("Fly\nprevalence\nratio")
   }
 
-   	#,side=2,line=3,las=1)
 
 	}else{
    op <- par(mar=c(1.5,1,4,0)+0.1)
@@ -761,7 +758,7 @@ if(i %in% xlabel_indices){
    # set up an empty plot
 MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	ylim=c(range(ytics)[1],range(ytics)[2]+diff(range(ytics))/20),ylab="",yaxt="n",
-	las=1,bty="n"
+	las=1,bty="n", log="y"
 	)
   box()
 	segments(x0=0,x1=6.2,y0=ytics[-1],lty=2,lwd=1,col="gray80")
@@ -769,6 +766,16 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 
 		if(i %in% xaxis_indices){
 	    axis(2,at=ytics,las=1)
+		  
+		  	    if(log_ticks==F){
+		  	      axis(2,at=ytics,las=1)
+		  	      }else{
+             axis(2, at=ytics, labels = FALSE)
+            text(ytics,  
+            labels = parse(text=paste("2^", exp_tics,  sep="")), 
+            pos = 2,las=1)
+		  	      }
+		  
 	}
 	#Vector of arms to plot:
 	which.arms<-arms %in% d$TR
@@ -808,7 +815,7 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 # Prevalence Difference plot function
 #-------------------------------------------
 
-diffplot<-function(d, i){
+diffplot<-function(d, i, log_ticks=F){
   
   xlabel_indices <- c(1,9,11,19,21,29)
   xaxis_indices <- c(2,10,12,20,22,30)
@@ -825,9 +832,11 @@ diffplot<-function(d, i){
 
   }else{
   
-  ytics <- seq(-1.4,0.6,by=.2)  #<----------Set the Y-axis range here
-  if(i==30){ytics <- seq(0.2,3,by=.4)}
-  ytics<-round(ytics,2)
+  ytics <- round(seq(-1.4,0.6,by=.2),1)  #<----------Set the Y-axis range here
+  if(i==30){
+    exp_tics<-seq(-0.5,2,by=.25)
+    ytics <- round(2^exp_tics,2)
+  }
 
 if(i %in% xlabel_indices){
    op <- par(mar=c(1,0,5,1)+0.1)
@@ -842,16 +851,28 @@ ulabplot("E.coli\nlog 10\ndifference")
    op <- par(mar=c(1.5,1,4,0)+0.1)
 
    # set up an empty plot
+     if(i==30){
 MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 	ylim=c(range(ytics)[1],range(ytics)[2]+diff(range(ytics))/20),ylab="",yaxt="n",
-	las=1,bty="n"
-	)
+	las=1,bty="n", log="y")
+  }else{
+MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
+	ylim=c(range(ytics)[1],range(ytics)[2]+diff(range(ytics))/20),ylab="",yaxt="n",
+	las=1,bty="n")}
+
   box()
 	segments(x0=0,x1=6.2,y0=ytics[-1],lty=2,lwd=1,col="gray80")
 	if(i!=30){segments(x0=0,x1=6.2,y0=0,lty=1,lwd=1,col="black")}
 	if(i==30){segments(x0=0,x1=max(MidPts+0.5),y0=1,lty=1,lwd=1,col="black")}
 		if(i %in% xaxis_indices){
-	    axis(2,at=ytics,las=1)
+	    if(i!=30 | log_ticks==F){axis(2,at=ytics,las=1)}
+      if(i==30 & log_ticks==T){axis(2, at=ytics, labels = FALSE)
+            text(ytics,  
+            labels = parse(text=paste("2^", exp_tics,  sep="")), 
+            pos = 2,las=1)
+        }
+
+		  
 	}
 	#Vector of arms to plot:
 	which.arms<-arms %in% d$TR
@@ -875,7 +896,6 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
 
 	  # X-axis labels
   	 		if(i %in% xaxis_indices){
- 		    #mtext(text="Arm",side=1,line=0.5,at=-1.35,col=cblack,cex=textsize,las=1)
   	 		mtext(text="",side=1,line=0.5,at=-1.35,col=cblack,cex=textsize,las=1)
     }
 
