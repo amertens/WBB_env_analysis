@@ -738,10 +738,10 @@ prplot<-function(d, i, log_ticks=F){
 
   }else{
   
-    exp_tics<-seq(-1.75,1,by=.25) #<----------Set the Y-axis range here
+    exp_tics<-seq(-2,1,by=.5) #<----------Set the Y-axis range here
     ytics <- round(2^exp_tics,2)
-   ytics <- c(0.25, 0.5, 1, 2)
-          labs = c("1/4","1/2","1","2")
+   #ytics <- c(0.25, 0.5, 1, 2)
+          labs = c("0.25","","0.5","","1","","2")
   
 if(i %in% xlabel_indices){
    op <- par(mar=c(1,0,5,1)+0.1)
@@ -839,10 +839,10 @@ diffplot<-function(d, i, log_ticks=F){
   ytics <- round(seq(-1.4,0.6,by=.2),1)  #<----------Set the Y-axis range here
   labs = NULL
   if(i==30){
-    exp_tics<-seq(-0.5,2,by=.25)
+    exp_tics<-seq(-2,2,by=.5)
     ytics <- round(2^exp_tics,2)
-       ytics <- c(0.25, 0.5, 1, 2, 4)
-       labs = c("1/4","1/2","1","2","4")
+      # ytics <- c(0.25, 0.5, 1, 2, 4)
+       labs = c("0.25","","0.5","","1","","2","","4")
   }
 
 if(i %in% xlabel_indices){
