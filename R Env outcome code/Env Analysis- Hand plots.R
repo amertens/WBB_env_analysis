@@ -39,9 +39,9 @@ ls()
 # World Bank prevalence processing
 #-----------------------------------
 
-mh_nail_prev<-cbind("Mother's nails", rownames(mh_nail_prev_a), as.data.frame(mh_nail_prev_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
-mh_fing_prev<-cbind("Mother's fingers", rownames(mh_fing_prev_a), as.data.frame( mh_fing_prev_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
-mh_palm_prev<-cbind("Mother's palms", rownames(mh_palm_prev_a), as.data.frame( mh_palm_prev_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_nail_prev<-cbind("Caregiver's nails", rownames(mh_nail_prev_a), as.data.frame(mh_nail_prev_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_fing_prev<-cbind("Caregiver's fingers", rownames(mh_fing_prev_a), as.data.frame( mh_fing_prev_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_palm_prev<-cbind("Caregiver's palms", rownames(mh_palm_prev_a), as.data.frame( mh_palm_prev_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_nail_prev<-cbind("Child's nails", rownames(ch_nail_prev_a), as.data.frame((ch_nail_prev_a))) %>% `rownames<-`(NULL) %>%  setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_fing_prev<-cbind("Child's fingers", rownames(ch_fing_prev_a), as.data.frame( (ch_fing_prev_a))) %>% `rownames<-`(NULL) %>%  setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_palm_prev<-cbind("Child's palms", rownames(ch_palm_prev_a), as.data.frame((ch_palm_prev_a))) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
@@ -78,9 +78,9 @@ prev$upper.ci<-prev$upper.ci*100
 # World Bank prevalence ratio processing
 #-----------------------------------
 
-mh_nail_rr_h1_unadj<-cbind("Mother's nails", rownames(mh_nail_rr_h1_unadj_a), as.data.frame(mh_nail_rr_h1_unadj_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
-mh_fing_rr_h1_unadj<-cbind("Mother's fingers", rownames(mh_fing_rr_h1_unadj_a), as.data.frame( mh_fing_rr_h1_unadj_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
-mh_palm_rr_h1_unadj<-cbind("Mother's palms", rownames(mh_palm_rr_h1_unadj_a), as.data.frame( mh_palm_rr_h1_unadj_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_nail_rr_h1_unadj<-cbind("Caregiver's nails", rownames(mh_nail_rr_h1_unadj_a), as.data.frame(mh_nail_rr_h1_unadj_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_fing_rr_h1_unadj<-cbind("Caregiver's fingers", rownames(mh_fing_rr_h1_unadj_a), as.data.frame( mh_fing_rr_h1_unadj_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_palm_rr_h1_unadj<-cbind("Caregiver's palms", rownames(mh_palm_rr_h1_unadj_a), as.data.frame( mh_palm_rr_h1_unadj_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_nail_rr_h1_unadj<-cbind("Child's nails", rownames(ch_nail_rr_h1_unadj_a), as.data.frame((ch_nail_rr_h1_unadj_a))) %>% `rownames<-`(NULL) %>%  setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_fing_rr_h1_unadj<-cbind("Child's fingers", rownames(ch_fing_rr_h1_unadj_a), as.data.frame( (ch_fing_rr_h1_unadj_a))) %>% `rownames<-`(NULL) %>%  setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_palm_rr_h1_unadj<-cbind("Child's palms", rownames(ch_palm_rr_h1_unadj_a), as.data.frame((ch_palm_rr_h1_unadj_a))) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
@@ -113,9 +113,9 @@ pr$TR = factor(pr$TR, c("C","S", "WSH"))
 # Midline prevalence processing
 #-----------------------------------
 
-mh_nail_prev_mid<-cbind("Mother's nails", rownames(mh_nail_prev_mid2_a), as.data.frame(mh_nail_prev_mid2_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
-mh_fing_prev_mid<-cbind("Mother's fingers", rownames(mh_fing_prev_mid2_a), as.data.frame( mh_fing_prev_mid2_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
-mh_palm_prev_mid<-cbind("Mother's palms", rownames(mh_palm_prev_mid2_a), as.data.frame( mh_palm_prev_mid2_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_nail_prev_mid<-cbind("Caregiver's nails", rownames(mh_nail_prev_mid2_a), as.data.frame(mh_nail_prev_mid2_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_fing_prev_mid<-cbind("Caregiver's fingers", rownames(mh_fing_prev_mid2_a), as.data.frame( mh_fing_prev_mid2_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_palm_prev_mid<-cbind("Caregiver's palms", rownames(mh_palm_prev_mid2_a), as.data.frame( mh_palm_prev_mid2_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_nail_prev_mid<-cbind("Child's nails", rownames(ch_nail_prev_mid2_a), as.data.frame((ch_nail_prev_mid2_a))) %>% `rownames<-`(NULL) %>%  setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_fing_prev_mid<-cbind("Child's fingers", rownames(ch_fing_prev_mid2_a), as.data.frame( (ch_fing_prev_mid2_a))) %>% `rownames<-`(NULL) %>%  setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_palm_prev_mid<-cbind("Child's palms", rownames(ch_palm_prev_mid2_a), as.data.frame((ch_palm_prev_mid2_a))) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
@@ -152,9 +152,9 @@ prev_mid$upper.ci<-prev_mid$upper.ci*100
 # Midline prevalence ratio processing
 #-----------------------------------
 
-mh_nail_rr_h1_unadj_mid<-cbind("Mother's nails", rownames(mh_nail_rr_h1_unadj_mid_a), as.data.frame(mh_nail_rr_h1_unadj_mid_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
-mh_fing_rr_h1_unadj_mid<-cbind("Mother's fingers", rownames(mh_fing_rr_h1_unadj_mid_a), as.data.frame( mh_fing_rr_h1_unadj_mid_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
-mh_palm_rr_h1_unadj_mid<-cbind("Mother's palms", rownames(mh_palm_rr_h1_unadj_mid_a), as.data.frame( mh_palm_rr_h1_unadj_mid_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_nail_rr_h1_unadj_mid<-cbind("Caregiver's nails", rownames(mh_nail_rr_h1_unadj_mid_a), as.data.frame(mh_nail_rr_h1_unadj_mid_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_fing_rr_h1_unadj_mid<-cbind("Caregiver's fingers", rownames(mh_fing_rr_h1_unadj_mid_a), as.data.frame( mh_fing_rr_h1_unadj_mid_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_palm_rr_h1_unadj_mid<-cbind("Caregiver's palms", rownames(mh_palm_rr_h1_unadj_mid_a), as.data.frame( mh_palm_rr_h1_unadj_mid_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_nail_rr_h1_unadj_mid<-cbind("Child's nails", rownames(ch_nail_rr_h1_unadj_mid_a), as.data.frame((ch_nail_rr_h1_unadj_mid_a))) %>% `rownames<-`(NULL) %>%  setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_fing_rr_h1_unadj_mid<-cbind("Child's fingers", rownames(ch_fing_rr_h1_unadj_mid_a), as.data.frame( (ch_fing_rr_h1_unadj_mid_a))) %>% `rownames<-`(NULL) %>%  setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_palm_rr_h1_unadj_mid<-cbind("Child's palms", rownames(ch_palm_rr_h1_unadj_mid_a), as.data.frame((ch_palm_rr_h1_unadj_mid_a))) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
@@ -187,9 +187,9 @@ pr_mid$TR = factor(pr_mid$TR, c("C","H", "WSH"))
 # Endline prevalence processing
 #-----------------------------------
 
-mh_nail_prev_end<-cbind("Mother's nails", rownames(mh_nail_prev_end2_a), as.data.frame(mh_nail_prev_end2_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
-mh_fing_prev_end<-cbind("Mother's fingers", rownames(mh_fing_prev_end2_a), as.data.frame( mh_fing_prev_end2_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
-mh_palm_prev_end<-cbind("Mother's palms", rownames(mh_palm_prev_end2_a), as.data.frame( mh_palm_prev_end2_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_nail_prev_end<-cbind("Caregiver's nails", rownames(mh_nail_prev_end2_a), as.data.frame(mh_nail_prev_end2_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_fing_prev_end<-cbind("Caregiver's fingers", rownames(mh_fing_prev_end2_a), as.data.frame( mh_fing_prev_end2_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_palm_prev_end<-cbind("Caregiver's palms", rownames(mh_palm_prev_end2_a), as.data.frame( mh_palm_prev_end2_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_nail_prev_end<-cbind("Child's nails", rownames(ch_nail_prev_end2_a), as.data.frame((ch_nail_prev_end2_a))) %>% `rownames<-`(NULL) %>%  setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_fing_prev_end<-cbind("Child's fingers", rownames(ch_fing_prev_end2_a), as.data.frame( (ch_fing_prev_end2_a))) %>% `rownames<-`(NULL) %>%  setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_palm_prev_end<-cbind("Child's palms", rownames(ch_palm_prev_end2_a), as.data.frame((ch_palm_prev_end2_a))) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
@@ -226,9 +226,9 @@ prev_end$upper.ci<-prev_end$upper.ci*100
 # Endline prevalence ratio processing
 #-----------------------------------
 
-mh_nail_rr_h1_unadj_end<-cbind("Mother's nails", rownames(mh_nail_rr_h1_unadj_end_a), as.data.frame(mh_nail_rr_h1_unadj_end_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
-mh_fing_rr_h1_unadj_end<-cbind("Mother's fingers", rownames(mh_fing_rr_h1_unadj_end_a), as.data.frame( mh_fing_rr_h1_unadj_end_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
-mh_palm_rr_h1_unadj_end<-cbind("Mother's palms", rownames(mh_palm_rr_h1_unadj_end_a), as.data.frame( mh_palm_rr_h1_unadj_end_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_nail_rr_h1_unadj_end<-cbind("Caregiver's nails", rownames(mh_nail_rr_h1_unadj_end_a), as.data.frame(mh_nail_rr_h1_unadj_end_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_fing_rr_h1_unadj_end<-cbind("Caregiver's fingers", rownames(mh_fing_rr_h1_unadj_end_a), as.data.frame( mh_fing_rr_h1_unadj_end_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
+mh_palm_rr_h1_unadj_end<-cbind("Caregiver's palms", rownames(mh_palm_rr_h1_unadj_end_a), as.data.frame( mh_palm_rr_h1_unadj_end_a)) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_nail_rr_h1_unadj_end<-cbind("Child's nails", rownames(ch_nail_rr_h1_unadj_end_a), as.data.frame((ch_nail_rr_h1_unadj_end_a))) %>% `rownames<-`(NULL) %>%  setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_fing_rr_h1_unadj_end<-cbind("Child's fingers", rownames(ch_fing_rr_h1_unadj_end_a), as.data.frame( (ch_fing_rr_h1_unadj_end_a))) %>% `rownames<-`(NULL) %>%  setNames(., c("1","2","3","4","5","6","7","8")) 
 ch_palm_rr_h1_unadj_end<-cbind("Child's palms", rownames(ch_palm_rr_h1_unadj_end_a), as.data.frame((ch_palm_rr_h1_unadj_end_a))) %>% `rownames<-`(NULL) %>% setNames(., c("1","2","3","4","5","6","7","8")) 
@@ -365,7 +365,7 @@ MidPts <- barplot(1:5,names.arg=NA,border=NA,col=NA,
     mtext(sprintf("%1.0f",d$Prevalence), side=3,line=0.25, at=pos,col=cols[which.arms],cex=textsize,las=1)
 		}
 
-           mtext(c("Mother's nails", "Mother's fingers", "Mother's palms", "Child's nails", "Child's fingers", "Child's palms")[i],
+           mtext(c("Caregiver's nails", "Caregiver's fingers", "Caregiver's palms", "Child's nails", "Child's fingers", "Child's palms")[i],
                         side=3,line=2.5,col="gray20",cex=0.95)
 }
 
